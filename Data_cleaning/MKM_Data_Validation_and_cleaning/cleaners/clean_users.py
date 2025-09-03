@@ -1,64 +1,111 @@
 # MKM_Data_Validation_and_cleaning/cleaners/clean_users.py
+import os, sys
+from datetime import datetime, timezone
 
-import os
-import sys
-from dotenv import load_dotenv
-from pyspark.sql import DataFrame
-
-# ✅ Load project root path
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+# bootstrap
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
+from project_bootstrap import bootstrap_project_paths
+bootstrap_project_paths(__file__)
 
-# ✅ Load env and import project modules
-load_dotenv(os.path.join(project_root, ".env"))
 from src.connections.db_connections import spark_session_for_JDBC
+from src.utils.config_loader import load_env_and_get
+from src.utils.path_utils import cleaning_output_paths
 from src.utils.cleaning_rules import load_cleaning_config, clean_dataframe_with_rules
 
+TABLE = "users"
+
 def main():
-    print("[SUCCESS] .env loaded from:", os.path.join(project_root, ".env"))
+    load_env_and_get()
+    spark = spark_session_for_JDBC(app_name=f"clean_{TABLE}")
 
-    spark = spark_session_for_JDBC()
+    try:
+        jdbc_url = os.getenv("DB_URL")
+        props = {"user": os.getenv("DB_USERNAME"), "password": os.getenv("DB_PASSWORD"), "driver": "com.mysql.cj.jdbc.Driver"}
+        df = spark.read.jdbc(url=jdbc_url, table=TABLE, properties=props)
 
-    table_name = "users"
-    print(f"🔄 Reading raw table: {table_name}")
+        rules = load_cleaning_config(TABLE, config_path=os.path.join("Data_cleaning", "src", "config", "master_schema_cleaning_rules.yaml"))
+        cleaned = clean_dataframe_with_rules(df, rules)
 
-    jdbc_url = f"jdbc:mysql://{os.getenv('DB_URL')}"
-    properties = {
-        "user": os.getenv("DB_USERNAME"),
-        "password": os.getenv("DB_PASSWORD"),
-        "driver": "com.mysql.cj.jdbc.Driver"
-    }
-
-    df: DataFrame = spark.read \
-        .format("jdbc") \
-        .option("url", jdbc_url) \
-        .option("dbtable", table_name) \
-        .option("user", properties["user"]) \
-        .option("password", properties["password"]) \
-        .option("driver", properties["driver"]) \
-        .load()
-
-    print(f"🧹 Applying cleaning rules for: {table_name}")
-    rules = load_cleaning_config(table_name)
-    cleaned_df = clean_dataframe_with_rules(df, rules)
-
-    output_path = os.path.join(
-        project_root,
-        "MKM_Data_Validation_and_cleaning",
-        "cleaned_outputs",
-        "users_cleaned_json"
-    ).replace("\\", "/")
-
-    print(f"💾 Saving cleaned JSON data to: {output_path}")
-    # cleaned_df.write.mode("overwrite").json(output_path)
-    cleaned_df.coalesce(1).write.mode("overwrite").format("json").save(output_path)
-    print(f"[SUCCESS] User cleaning completed. Cleaned data saved at: {output_path}")
-    spark.stop()
-       
+        out_path = cleaning_output_paths(TABLE, "parquet")
+        cleaned.write.mode("overwrite").parquet(out_path)
+        print(f"[CLEANING] ✅ {TABLE} -> {out_path}")
+    finally:
+        spark.stop()
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
+
+
+
+
+
+
+# import os
+# import sys
+# from dotenv import load_dotenv
+# from pyspark.sql import DataFrame
+
+# # ✅ Load project root path
+# project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+# if project_root not in sys.path:
+#     sys.path.insert(0, project_root)
+
+# # ✅ Load env and import project modules
+# load_dotenv(os.path.join(project_root, ".env"))
+# from src.connections.db_connections import spark_session_for_JDBC
+# from src.utils.cleaning_rules import load_cleaning_config, clean_dataframe_with_rules
+
+# def main():
+#     print("[SUCCESS] .env loaded from:", os.path.join(project_root, ".env"))
+
+#     spark = spark_session_for_JDBC()
+
+#     table_name = "users"
+#     print(f"🔄 Reading raw table: {table_name}")
+
+#     jdbc_url = f"jdbc:mysql://{os.getenv('DB_URL')}"
+#     properties = {
+#         "user": os.getenv("DB_USERNAME"),
+#         "password": os.getenv("DB_PASSWORD"),
+#         "driver": "com.mysql.cj.jdbc.Driver"
+#     }
+
+#     df: DataFrame = spark.read \
+#         .format("jdbc") \
+#         .option("url", jdbc_url) \
+#         .option("dbtable", table_name) \
+#         .option("user", properties["user"]) \
+#         .option("password", properties["password"]) \
+#         .option("driver", properties["driver"]) \
+#         .load()
+
+#     print(f"🧹 Applying cleaning rules for: {table_name}")
+#     rules = load_cleaning_config(table_name)
+#     cleaned_df = clean_dataframe_with_rules(df, rules)
+
+#     output_path = os.path.join(
+#         project_root,
+#         "MKM_Data_Validation_and_cleaning",
+#         "cleaned_outputs",
+#         "users_cleaned_json"
+#     ).replace("\\", "/")
+
+#     print(f"💾 Saving cleaned JSON data to: {output_path}")
+#     # cleaned_df.write.mode("overwrite").json(output_path)
+#     cleaned_df.coalesce(1).write.mode("overwrite").format("json").save(output_path)
+#     print(f"[SUCCESS] User cleaning completed. Cleaned data saved at: {output_path}")
+#     spark.stop()
+       
+
+# if __name__ == "__main__":
+#     main()
 
 
 

@@ -1,5 +1,5 @@
 version: v1
-generated_at: '2025-07-23 17:23:29'
+generated_at: '2025-08-18 17:01:05'
 tables:
   address:
     rename_columns:
@@ -25,9 +25,7 @@ tables:
     standardize_units: {}
     null_replacements: {}
     case_formatting: {}
-    type_conversions:
-      created_at: TimestampType
-      updated_at: TimestampType
+    type_conversions: {}
   category:
     rename_columns:
       id: category_id
@@ -37,6 +35,25 @@ tables:
     type_conversions:
       created_at: TimestampType
       updated_at: TimestampType
+  coupon_usage:
+    rename_columns:
+      id: coupon_usage_id
+    standardize_units: {}
+    null_replacements: {}
+    case_formatting: {}
+    type_conversions:
+      used_at: TimestampType
+  coupons:
+    rename_columns:
+      id: coupons_id
+    standardize_units: {}
+    null_replacements: {}
+    case_formatting: {}
+    type_conversions:
+      created_at: TimestampType
+      updated_at: TimestampType
+      valid_from: TimestampType
+      valid_to: TimestampType
   inventories:
     rename_columns:
       id: inventories_id
@@ -54,6 +71,41 @@ tables:
     case_formatting: {}
     type_conversions:
       created_at: TimestampType
+  order_items:
+    rename_columns:
+      id: order_items_id
+    standardize_units: {}
+    null_replacements: {}
+    case_formatting: {}
+    type_conversions:
+      created_at: TimestampType
+  order_payments:
+    rename_columns:
+      id: order_payments_id
+    standardize_units: {}
+    null_replacements: {}
+    case_formatting: {}
+    type_conversions:
+      created_at: TimestampType
+      payment_date: TimestampType
+      updated_at: TimestampType
+  order_status_history:
+    rename_columns:
+      id: order_status_history_id
+    standardize_units: {}
+    null_replacements: {}
+    case_formatting: {}
+    type_conversions:
+      created_at: TimestampType
+  orders:
+    rename_columns:
+      id: orders_id
+    standardize_units: {}
+    null_replacements: {}
+    case_formatting: {}
+    type_conversions:
+      created_at: TimestampType
+      updated_at: TimestampType
   payment:
     rename_columns:
       id: payment_id
@@ -100,6 +152,8 @@ tables:
     type_conversions:
       created_at: TimestampType
       updated_at: TimestampType
+      is_active: BooleanType
+      is_featured: BooleanType
   recently_viewed_products:
     rename_columns:
       id: recently_viewed_products_id
@@ -151,6 +205,7 @@ tables:
     type_conversions:
       create_time: TimestampType
       update_time: TimestampType
+      active: BooleanType
   wishlist:
     rename_columns:
       id: wishlist_id

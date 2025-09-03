@@ -1,0 +1,34 @@
+# .gitignore for cleaning and validation
+# This file is used to specify files and directories that should be ignored by Git.
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# # VS Code
+# .vscode/
+
+# # Virtual environments
+# mankind_env/
+# env/
+# venv/
+
+# # Environment files
+# .env
+
+# # Logs and temp
+# *.log
+# *.tmp
+
+# # Data dumps
+# *.sqlite
+# *.csv
+# *.parquet
+# *.json
+
+# # Jupyter
+# .ipynb_checkpoints/
+
+# # Misc
+# .DS_Store
+# *.zip

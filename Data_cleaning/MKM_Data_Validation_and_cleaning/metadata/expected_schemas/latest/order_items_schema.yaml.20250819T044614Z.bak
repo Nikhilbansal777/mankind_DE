@@ -1,0 +1,15 @@
+generated_at: 20250819T042552Z
+required: []
+optional:
+- created_at
+- id
+- order_id
+- product_id
+- product_name
+- product_price
+- quantity
+- subtotal
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

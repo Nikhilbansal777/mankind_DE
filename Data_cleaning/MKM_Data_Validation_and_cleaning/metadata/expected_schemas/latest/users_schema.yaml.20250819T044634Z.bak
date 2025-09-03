@@ -1,0 +1,18 @@
+generated_at: 20250819T042609Z
+required: []
+optional:
+- active
+- create_time
+- email
+- first_name
+- id
+- keycloak_id
+- last_name
+- profile_picture_url
+- role
+- update_time
+- username
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

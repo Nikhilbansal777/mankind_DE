@@ -1,0 +1,19 @@
+generated_at: 20250819T042344Z
+required: []
+optional:
+- average_rating
+- brand
+- category_id
+- created_at
+- description
+- id
+- is_active
+- is_featured
+- model
+- name
+- sku
+- updated_at
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

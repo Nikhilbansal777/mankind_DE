@@ -1,0 +1,22 @@
+generated_at: 20250819T042329Z
+required: []
+optional:
+- code
+- created_at
+- current_usage
+- description
+- id
+- is_active
+- max_usage
+- minimum_order_amount
+- name
+- one_time_use_per_user
+- type
+- updated_at
+- valid_from
+- valid_to
+- value
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

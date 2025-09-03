@@ -1,0 +1,10 @@
+generated_at: 20250819T044757Z
+required: []
+optional:
+- attr_key
+- attr_value
+- user_id
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

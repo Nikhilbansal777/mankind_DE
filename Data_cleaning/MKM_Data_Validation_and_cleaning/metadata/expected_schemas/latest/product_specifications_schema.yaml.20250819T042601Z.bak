@@ -1,0 +1,10 @@
+generated_at: 20250819T042343Z
+required: []
+optional:
+- product_id
+- spec_key
+- spec_value
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

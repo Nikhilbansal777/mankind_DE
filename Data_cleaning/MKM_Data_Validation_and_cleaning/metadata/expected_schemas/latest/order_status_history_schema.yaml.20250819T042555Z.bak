@@ -1,0 +1,14 @@
+generated_at: 20250819T042335Z
+required: []
+optional:
+- created_at
+- created_by
+- id
+- notes
+- order_id
+- payment_status
+- status
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

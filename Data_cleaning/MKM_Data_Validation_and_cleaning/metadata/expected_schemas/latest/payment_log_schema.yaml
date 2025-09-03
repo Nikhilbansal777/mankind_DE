@@ -1,0 +1,12 @@
+generated_at: 20250819T044748Z
+required: []
+optional:
+- created_at
+- id
+- log_message
+- log_type
+- payment_id
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

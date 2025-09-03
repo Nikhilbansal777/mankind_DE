@@ -10,15 +10,14 @@ from pyspark.sql import SparkSession
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
+from project_bootstrap import bootstrap_project_paths
+bootstrap_project_paths(__file__)
 
 from src.utils.config_loader import load_env_and_get
+from src.connections.db_connections import spark_session_for_JDBC
 
-
-def get_spark():
-    return SparkSession.builder \
-        .appName("ExploreAndEnrichSchema") \
-        .config("spark.jars", os.getenv("JDBC_PATH")) \
-        .getOrCreate()
+def get_spark() -> SparkSession:
+    return spark_session_for_JDBC(app_name="ExploreAndEnrichSchema")
 
 
 def get_lowercase_tables(spark, jdbc_url, props):
@@ -35,10 +34,13 @@ def explore_table_schema(spark, jdbc_url, props, table_name):
     df = spark.read.jdbc(url=jdbc_url, table=table_name, properties=props)
     types = infer_column_types(df)
 
-    # Detect timestamp-type columns
-    type_conversions = {
-        col: dtype for col, dtype in types.items() if "timestamp" in dtype.lower()
-    }
+    # # Detect timestamp-type columns
+    # type_conversions = {
+    #     col: dtype for col, dtype in types.items() if "timestamp" in dtype.lower()
+    # }
+
+    # Suggest timestamp conversions
+    type_conversions = {c: "TimestampType" for c, t in types.items() if "timestamp" in t.lower()}
 
     # Rename 'id' to table_name + '_id' if needed
     rename_columns = {}
@@ -61,7 +63,8 @@ def get_next_version(output_dir):
 
 
 def save_schema_report(data):
-    output_dir = os.path.join("MKM_Data_Validation_and_cleaning", "reports")
+    # ✅ Write under Data_cleaning/MKM_Data_Validation_and_cleaning/reports
+    output_dir = os.path.join("Data_cleaning", "MKM_Data_Validation_and_cleaning", "reports", "profiling_schema_summary")
     os.makedirs(output_dir, exist_ok=True)
 
     version = get_next_version(output_dir)
@@ -92,7 +95,7 @@ def main():
 
     try:
         tables = get_lowercase_tables(spark, jdbc_url, props)
-        print(f"✅ Found {len(tables)} lowercase tables.")
+        print(f"✅ Found {len(tables)} lowercase tables: {tables}")
 
         enriched = {}
         for tbl in tables:
@@ -106,8 +109,8 @@ def main():
         }
 
         v_path, latest_path = save_schema_report(summary)
-        print(f"🗃️  Saved versioned: {v_path}")
-        print(f"📌 Saved latest: {latest_path}")
+        print(f"🗃️  Saved versioned: {os.path.abspath(v_path)}")
+        print(f"📌 Saved latest: {os.path.abspath(latest_path)}")
 
     finally:
         spark.stop()

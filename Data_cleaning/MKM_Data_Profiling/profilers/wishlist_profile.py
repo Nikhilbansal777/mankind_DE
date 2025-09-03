@@ -3,6 +3,7 @@
 import sys
 import os
 import json
+from datetime import datetime, timezone
 
 # --- Temporary path injection ---
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -16,8 +17,14 @@ bootstrap_project_paths(__file__)
 from src.connections.db_connections import spark_session_for_JDBC
 from src.utils.config_loader import load_env_and_get
 from src.utils.path_utils import get_local_output_path
+from src.utils.log_utils import get_logger
+from src.utils import file_io
 from MKM_Data_Profiling.profilers.all_common_profilers import run_common_profilers, sanitize_summary
 
+logger = get_logger("profilers.wishlist")
+
+def _ts() -> str:
+    return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
 def profile_wishlist_table():
     # Load environment variables
@@ -26,16 +33,19 @@ def profile_wishlist_table():
     # Start Spark session
     spark = spark_session_for_JDBC()
 
-    jdbc_url = f"jdbc:mysql://{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+    jdbc_url = load_env_and_get("DB_URL")
     props = {
-        "user": os.getenv("DB_USERNAME"),
-        "password": os.getenv("DB_PASSWORD"),
+        "user": load_env_and_get("DB_USERNAME"),
+        "password": load_env_and_get("DB_PASSWORD"),
         "driver": "com.mysql.cj.jdbc.Driver"
     }
 
+    run_id = _ts()
     try:
         # Step 1: Read `wishlist` table
+        logger.info("starting profiling", extra={"run_id": run_id, "table": "wishlist"})
         df = spark.read.jdbc(url=jdbc_url, table="wishlist", properties=props)
+        logger.info("loaded table", extra={"table": "wishlist"})
         print("[INFO] Loaded 'wishlist' table")
 
         # Step 2: Run reusable profilers
@@ -47,18 +57,21 @@ def profile_wishlist_table():
         # Step 4: Determine output path
         output_dir = get_local_output_path("profiling_reports/profiling")
         os.makedirs(output_dir, exist_ok=True)
-        output_path = os.path.join(output_dir, "wishlist_profile.json")
+        output_path = os.path.join(output_dir, f"wishlist_profile_{run_id}.json")
 
         # Step 5: Save to JSON
-        with open(output_path, "w") as f:
-            json.dump(summary, f, indent=2)
+        file_io.write_json(summary, output_path)
+        logger.info("profiling saved", extra={"table": "wishlist", "path": output_path, "run_id": run_id})
         print(f"[SUCCESS] Profiling report saved to: {output_path}")
 
     except Exception as e:
+        logger.error(f"profiling failed: {e}", extra={"table": "wishlist", "run_id": run_id})
         print(f"[ERROR] Profiling failed for wishlist: {e}")
+        raise
 
     finally:
         spark.stop()
+        logger.info("spark session stopped", extra={"table": "wishlist", "run_id": run_id})
         print("[INFO] Spark session stopped.")
 
 

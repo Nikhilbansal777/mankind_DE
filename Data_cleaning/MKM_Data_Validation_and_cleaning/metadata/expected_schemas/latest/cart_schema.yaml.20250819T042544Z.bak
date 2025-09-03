@@ -1,0 +1,16 @@
+generated_at: 20250819T042324Z
+required: []
+optional:
+- created_at
+- id
+- session_id
+- status
+- subtotal
+- tax
+- total
+- updated_at
+- user_id
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

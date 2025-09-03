@@ -1,0 +1,14 @@
+generated_at: 20250819T042348Z
+required: []
+optional:
+- comment
+- created_at
+- id
+- product_id
+- rating
+- updated_at
+- user_id
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

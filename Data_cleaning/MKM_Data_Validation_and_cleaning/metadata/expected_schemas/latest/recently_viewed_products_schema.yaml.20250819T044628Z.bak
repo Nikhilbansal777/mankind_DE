@@ -1,0 +1,12 @@
+generated_at: 20250819T042604Z
+required: []
+optional:
+- id
+- last_viewed_at
+- product_id
+- user_id
+- viewed_at
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

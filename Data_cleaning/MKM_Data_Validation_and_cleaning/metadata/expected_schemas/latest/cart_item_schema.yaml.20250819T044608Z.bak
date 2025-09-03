@@ -1,0 +1,12 @@
+generated_at: 20250819T042545Z
+required: []
+optional:
+- cart_id
+- id
+- price
+- product_id
+- quantity
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

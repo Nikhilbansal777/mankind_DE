@@ -1,0 +1,10 @@
+generated_at: 20250819T044756Z
+required: []
+optional:
+- created_at
+- id
+- name
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

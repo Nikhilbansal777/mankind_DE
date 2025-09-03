@@ -1,0 +1,10 @@
+generated_at: 20250819T042600Z
+required: []
+optional:
+- image_url
+- images_order
+- product_id
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

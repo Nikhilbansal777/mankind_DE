@@ -13,5 +13,5 @@ def print_tree(startpath, prefix=""):
             print(f"{prefix}{item}")
 
 # Change this to your project root if needed
-project_root = r"E:\mankind_matrix_project"
+project_root = r"E:\MKM\mankind_matrix_data_engineering\Data_cleaning"
 print_tree(project_root)
