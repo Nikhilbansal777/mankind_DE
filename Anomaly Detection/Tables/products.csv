@@ -1,0 +1,10 @@
+id,brand,category_id,created_at,description,is_active,is_featured,model,name,sku,updated_at,average_rating
+1,SpectraForce,1,2025-05-21 16:36:55,Gaming GPU (X Series),1,1,X-Series,SpectraForce X Series,SFX-12G-001,2025-07-28 18:54:31.294676,3.75
+3,ThunderCore,1,2025-05-21 16:36:55,AI GPU for ML workloads,1,0,AI-Series,ThunderCore AI GPU,TCG-32G-001,2025-07-15 17:29:47.938569,3.0
+7,Raspberry Pi,3,2025-05-21 16:36:55,Single-board computer,1,1,Model 4B,RASPBERRY PI 4,RPI4-4G-001,2025-05-21 16:36:55,
+8,Arduino,4,2025-05-21 16:36:55,Open-source electronics board,1,1,UNO R3,ARDUINO UNO,ARDU-UNO-001,2025-05-21 16:36:55,
+9,NVIDIA,5,2025-05-21 16:36:55,AI edge computing module,1,1,Jetson Nano,NVIDIA JETSON,NVJ-NANO-001,2025-05-21 16:36:55,
+10,Espressif,6,2025-05-21 16:36:55,ESP32 Dev Kit (Wi-Fi + BT),1,1,ESP32,ESP32 DEV KIT,ESP32-DK-001,2025-05-21 16:36:55,
+14,Apple,1,2025-05-21 18:44:10.056278,Smartphone,1,0,Pro Max,iPhone 16,IP13P-254-BLK,2025-06-11 06:21:58.377723,
+15,Apple,1,2025-05-28 16:51:08.218544,Smartphone (Pro),1,0,A2482,iPhone 16 Pro,IP13P-256-BLK,2025-05-28 16:51:08.218544,
+20,Test Brand,7,2025-06-16 15:39:42.996792,Test product,1,0,Test Model,Test Product,123-344-566,2025-06-16 15:39:42.996792,
