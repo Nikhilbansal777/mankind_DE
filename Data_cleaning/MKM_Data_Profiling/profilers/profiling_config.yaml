@@ -1,0 +1,44 @@
+version: 1
+
+tables:
+  orders:
+    value_frequencies:
+      columns_include: [status, shipping_method, payment_status]
+      columns_exclude: []         # PII none here
+      sample_fraction: 0.25
+
+  order_items:
+    value_frequencies:
+      columns_include: [product_id, quantity]
+      sample_fraction: 0.5
+
+  payments:
+    value_frequencies:
+      columns_include: [currency, provider, status]
+      sample_fraction: 0.25
+
+  order_status_history:
+    value_frequencies:
+      columns_include: [source, from_status, to_status]
+      sample_fraction: 0.5
+
+  users:
+    value_frequencies:
+      columns_exclude: [email, username]     # redact PII
+      sample_fraction: 0.25
+
+  products:
+    value_frequencies:
+      columns_exclude: [description]         # skip long text
+      sample_fraction: 0.25
+
+  category:
+    value_frequencies:
+      # use defaults
+
+  address:
+    value_frequencies:
+      columns_exclude: [address_line1, address_line2, city, zipcode]  # avoid PII-like fields
+      # keep country/state if you want distros:
+      columns_include: [country, state]
+      sample_fraction: 0.25

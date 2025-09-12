@@ -3,3 +3,7 @@ mysql-connector-python==8.2.0
 python-dotenv==1.0.1
 pyyaml==6.0.1
 pandas==1.5.3
+# python=3.10.11
+
+[HADOOP-WIN] winutils=OK | hadoop.dll=OK | hadoop_jars=3.3.1 | expect=3.3.1
+

@@ -1,65 +1,125 @@
 # MKM_Data_Profiling/profilers/orders_profile.py
 
-import sys
-import os
-from datetime import datetime, timezone
-
-# --- Project path bootstrapping ---
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
-from project_bootstrap import bootstrap_project_paths
-bootstrap_project_paths(__file__)
-# --- End bootstrapping ---
-
-from src.connections.db_connections import spark_session_for_JDBC
-from src.utils.config_loader import load_env_and_get
-from src.utils.path_utils import get_local_output_path
-from src.utils.log_utils import get_logger
-from src.utils import file_io
-from MKM_Data_Profiling.profilers.all_common_profilers import run_common_profilers, sanitize_summary
-
-logger = get_logger("profilers.orders")
-
-def _ts() -> str:
-    return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-
-def profile_orders_table():
-    load_env_and_get()
-    spark = spark_session_for_JDBC()
-
-    jdbc_url = load_env_and_get("DB_URL")
-    props = {
-        "user": load_env_and_get("DB_USERNAME"),
-        "password": load_env_and_get("DB_PASSWORD"),
-        "driver": "com.mysql.cj.jdbc.Driver",
-    }
-
-    run_id = _ts()
-    try:
-        logger.info("starting profiling", extra={"run_id": run_id, "table": "orders"})
-        df = spark.read.jdbc(url=jdbc_url, table="orders", properties=props)
-        logger.info("loaded table", extra={"table": "orders"})
-
-        summary = sanitize_summary(run_common_profilers(df, table_name="orders"))
-
-        out_dir = get_local_output_path("profiling_reports", "profiling")
-        os.makedirs(out_dir, exist_ok=True)
-        out_path = os.path.join(out_dir, f"orders_profile_{run_id}.json")
-
-        file_io.write_json(summary, out_path)
-        logger.info("profiling saved", extra={"table": "orders", "path": out_path, "run_id": run_id})
-    except Exception as e:
-        logger.error(f"profiling failed: {e}", extra={"table": "orders", "run_id": run_id})
-        raise
-    finally:
-        spark.stop()
-        logger.info("spark session stopped", extra={"table": "orders", "run_id": run_id})
-
+# orders_profile.py
+from _base_profile import profile_once
 if __name__ == "__main__":
-    profile_orders_table()
+    profile_once("orders", logger_name="profilers.orders")
 
 
+
+
+#-------------Fall back code for individual table profiling----------------
+# import sys
+# import os
+# import socket
+# from urllib.parse import urlparse
+# from datetime import datetime, timezone
+
+# # --- Project path bootstrapping ---
+# project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+# if project_root not in sys.path:
+#     sys.path.insert(0, project_root)
+# from project_bootstrap import bootstrap_project_paths
+# bootstrap_project_paths(__file__)
+# # --- End bootstrapping ---
+
+# from src.connections.db_connections import spark_session_for_JDBC
+# from src.utils.config_loader import load_env_and_get
+# from src.utils.path_utils import get_local_output_path
+# from src.utils.log_utils import get_logger
+# from src.utils import file_io
+# from MKM_Data_Profiling.profilers.all_common_profilers import run_common_profilers, sanitize_summary
+
+# logger = get_logger("profilers.orders")
+
+# def _ts() -> str:
+#     return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+
+# def _build_mysql_jdbc_url() -> str:
+#     """
+#     Prefer DB_URL (full JDBC). Otherwise compose from HOST/PORT/DB with Aiven-friendly TLS defaults.
+#     """
+#     raw = (load_env_and_get("DB_URL", default="") or "").strip()
+#     if raw.startswith("jdbc:mysql://"):
+#         return raw
+
+#     host = load_env_and_get("DB_HOST").strip()
+#     port = (load_env_and_get("DB_PORT", "3306") or "3306").strip()
+#     db   = load_env_and_get("DB_NAME").strip()
+
+#     # TLS + sane timeouts for Aiven/MySQL 8
+#     return (
+#         f"jdbc:mysql://{host}:{port}/{db}"
+#         "?useSSL=true&sslMode=REQUIRED&enabledTLSProtocols=TLSv1.2,TLSv1.3"
+#         "&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+#         "&connectTimeout=5000&socketTimeout=15000"
+#     )
+
+# def _parse_host_port_from_jdbc(jdbc_url: str) -> tuple[str, int, str]:
+#     # urlparse doesn't recognize the 'jdbc:' scheme; strip it for parsing.
+#     u = urlparse(jdbc_url.replace("jdbc:", "", 1))
+#     return u.hostname, (u.port or 3306), u.path.lstrip("/")
+
+# def _preflight_mysql(host: str, port: int, timeout: float = 3.0) -> None:
+#     # DNS
+#     socket.gethostbyname(host)
+#     # Port reachability
+#     s = socket.socket()
+#     s.settimeout(timeout)
+#     try:
+#         s.connect((host, port))
+#     finally:
+#         s.close()
+
+# def profile_orders_table():
+#     load_env_and_get()
+#     spark = spark_session_for_JDBC()
+
+#     # jdbc_url = load_env_and_get("DB_URL")
+#     jdbc_url = _build_mysql_jdbc_url()
+#     host, port, db = _parse_host_port_from_jdbc(jdbc_url)
+#     logger.info("jdbc preflight", extra={"host": host, "port": port, "db": db})
+#     _preflight_mysql(host, port)
+
+#     props = {
+#         "user": load_env_and_get("DB_USERNAME").strip(),
+#         "password": load_env_and_get("DB_PASSWORD").strip(),
+#         "driver": "com.mysql.cj.jdbc.Driver",
+#     }
+
+#     run_id = _ts()
+#     try:
+#         logger.info("starting profiling", extra={"run_id": run_id, "table": "orders"})
+
+#         # Tiny auth/TLS smoke test to fail fast with a clean error if creds/TLS are wrong
+#         spark.read.jdbc(url=jdbc_url, table="(select 1) t", properties=props).collect()
+
+#         #Load orders table
+#         df = spark.read.jdbc(url=jdbc_url, table="orders", properties=props)
+#         row_count = df.count()
+#         logger.info("loaded table", extra={"table": "orders"})
+
+#         # Common profilers → sanitized summary JSON
+#         summary = sanitize_summary(run_common_profilers(df, table_name="orders"))
+
+#         # Write out
+#         out_dir = get_local_output_path("profiling_reports", "profiling")
+#         os.makedirs(out_dir, exist_ok=True)
+#         out_path = os.path.join(out_dir, f"orders_profile_{run_id}.json")
+
+#         file_io.write_json(summary, out_path)
+#         logger.info("profiling saved", extra={"table": "orders", "path": out_path, "run_id": run_id})
+#     except Exception as e:
+#         logger.error(f"profiling failed: {e}", extra={"table": "orders", "run_id": run_id})
+#         raise
+#     finally:
+#         spark.stop()
+#         logger.info("spark session stopped", extra={"table": "orders", "run_id": run_id})
+
+# if __name__ == "__main__":
+#     profile_orders_table()
+
+#-------------Fall back code for individual table profiling----------------
 
 
 

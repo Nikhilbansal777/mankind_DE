@@ -1,41 +1,77 @@
 # MKM_Data_Validation_and_cleaning/cleaners/clean_users.py
-import os, sys
-from datetime import datetime, timezone
 
-# bootstrap
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
+# --- robust bootstrap: find repo root and import project_bootstrap ---
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).resolve()
+REPO_ROOT = next(p for p in [HERE.parent] + list(HERE.parents) if (p / "project_bootstrap.py").exists())
+sys.path.insert(0, str(REPO_ROOT))
 from project_bootstrap import bootstrap_project_paths
 bootstrap_project_paths(__file__)
+# ---------------------------------------------------------------------
 
-from src.connections.db_connections import spark_session_for_JDBC
-from src.utils.config_loader import load_env_and_get
-from src.utils.path_utils import cleaning_output_paths
-from src.utils.cleaning_rules import load_cleaning_config, clean_dataframe_with_rules
 
-TABLE = "users"
-
-def main():
-    load_env_and_get()
-    spark = spark_session_for_JDBC(app_name=f"clean_{TABLE}")
-
-    try:
-        jdbc_url = os.getenv("DB_URL")
-        props = {"user": os.getenv("DB_USERNAME"), "password": os.getenv("DB_PASSWORD"), "driver": "com.mysql.cj.jdbc.Driver"}
-        df = spark.read.jdbc(url=jdbc_url, table=TABLE, properties=props)
-
-        rules = load_cleaning_config(TABLE, config_path=os.path.join("Data_cleaning", "src", "config", "master_schema_cleaning_rules.yaml"))
-        cleaned = clean_dataframe_with_rules(df, rules)
-
-        out_path = cleaning_output_paths(TABLE, "parquet")
-        cleaned.write.mode("overwrite").parquet(out_path)
-        print(f"[CLEANING] ✅ {TABLE} -> {out_path}")
-    finally:
-        spark.stop()
+from MKM_Data_Validation_and_cleaning.cleaners.run_cleaning_common import run_clean_table
 
 if __name__ == "__main__":
-    main()
+    run_clean_table("users", file_format="json")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# import os, sys
+# from datetime import datetime, timezone
+
+# # bootstrap
+# project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+# if project_root not in sys.path:
+#     sys.path.insert(0, project_root)
+# from project_bootstrap import bootstrap_project_paths
+# bootstrap_project_paths(__file__)
+
+# from src.connections.db_connections import spark_session_for_JDBC
+# from src.utils.config_loader import load_env_and_get
+# from src.utils.path_utils import cleaning_output_paths
+# from src.utils.cleaning_rules import load_cleaning_config, clean_dataframe_with_rules
+
+# TABLE = "users"
+
+# def main():
+#     load_env_and_get()
+#     spark = spark_session_for_JDBC(app_name=f"clean_{TABLE}")
+
+#     try:
+#         jdbc_url = os.getenv("DB_URL")
+#         props = {"user": os.getenv("DB_USERNAME"), "password": os.getenv("DB_PASSWORD"), "driver": "com.mysql.cj.jdbc.Driver"}
+#         df = spark.read.jdbc(url=jdbc_url, table=TABLE, properties=props)
+
+#         rules = load_cleaning_config(TABLE, config_path=os.path.join("Data_cleaning", "src", "config", "master_schema_cleaning_rules.yaml"))
+#         cleaned = clean_dataframe_with_rules(df, rules)
+
+#         out_path = cleaning_output_paths(TABLE, "parquet")
+#         cleaned.write.mode("overwrite").parquet(out_path)
+#         print(f"[CLEANING] ✅ {TABLE} -> {out_path}")
+#     finally:
+#         spark.stop()
+
+# if __name__ == "__main__":
+#     main()
 
 
 

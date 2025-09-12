@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mkm-data-cleaning"
+version = "0.1.0"
+description = "MKM data cleaning & validations (packaged from Data_cleaning/)"
+requires-python = ">=3.8,<3.11"
+dependencies = [
+  "pyspark==3.2.4",
+  "PyYAML>=6.0",
+  "python-dotenv>=1.0.0"
+]
+
+[tool.setuptools]
+# Discover packages one level ABOVE this pyproject (repo root),
+# so we can install both 'Data_cleaning' and 'src' together.
+package-dir = {"" = ".."}
+packages = ["Data_cleaning", "src"]
+
+[tool.setuptools.package-data]
+"*" = ["**/*.yaml", "**/*.yml", "**/*.json", "**/*.jar", "**/*.md"]
+
+[project.scripts]
+mkm-prevalidate = "Data_cleaning.MKM_Data_Validation_and_cleaning.validators.pre_validations.run_prevalidate_all:main"
+mkm-clean = "Data_cleaning.MKM_Data_Validation_and_cleaning.cleaners.run_cleaning_cli:main"
