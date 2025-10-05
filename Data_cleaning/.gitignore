@@ -1,72 +1,84 @@
-# .gitignore for Mankind project
-
-# Python cache
-__pycache__/
-*.py[cod]
-
-# VS Code
-.vscode/
-
-# Virtual environments
-mankind_env/
-env/
-venv/
-
-# Environment files
-.env
-
-# Logs and temp
-*.log
-*.tmp
-
-# Data dumps
-*.sqlite
-*.csv
-*.parquet
-*.json
-
-# Jupyter
-.ipynb_checkpoints/
-
-# Misc
-.DS_Store
-*.zip
-
-# OS / IDE
+### ---- OS / Editors ----
 .DS_Store
 Thumbs.db
 .idea/
 .vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
 
-# Python
+### ---- Python / Build Artifacts ----
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
 *.pyd
 *.egg-info/
+.eggs/
+
+### ---- Virtual Envs ----
 .venv/
 venv/
 env/
 mankind_env/
 
-# Env & secrets
-*.env
+### ---- Secrets / Env ----
 .env
+**/.env
+*.env
 *.key
 *.pem
 
-# Spark/Hadoop scratch & big data formats
+### ---- Notebooks ----
+.ipynb_checkpoints/
+
+### ---- Logs / Temp ----
+*.log
+*.tmp
+logs/
+reports/logs/
+spark_temp_cleanup/
+
+### ---- Spark / Hadoop scratch ----
 spark-warehouse/
 metastore_db/
 .derby/
-_*               # Spark temp
-*.crc
+_*                 # Spark temp files
+**/_SUCCESS
+**/*.crc
+
+### ---- Columnar / Big data formats (generated) ----
 *.parquet
 *.snappy.parquet
 *.orc
 *.avro
 
-# Project outputs (heavy)
-Data_cleaning/MKM_Glue_tranformations/transformed_outputs/
+### ---- Project Outputs (generated; keep source small) ----
+# Generic generated outputs
 transformed_outputs/
-reports/logs/
+Data_cleaning/MKM_Glue_tranformations/transformed_outputs/
+
+# Validation & cleaning outputs (adjust to your actual paths)
+MKM_Data_Validation_and_cleaning/cleaned_outputs/
+MKM_Data_Validation_and_cleaning/reports/
+MKM_Data_Validation_and_cleaning/tmp/
+
+# Profiling reports can get huge; default ignore
+MKM_Data_Profiling/profiling_reports/
+
+### ---- Data dumps (default ignore) ----
+*.sqlite
+*.csv
+*.json
+
+# ---- Keep config & schema under version control (override ignores) ----
+# Keep config & schema JSON/YAML in src/config and similar
+!src/config/**
+!**/config/*.json
+!**/config/*.yaml
+!**/config/*.yml
+
+# If you want to version a small curated subset of profiling/validation, un-comment the below
+# !MKM_Data_Profiling/profiling_reports/keep/**
+# !MKM_Data_Validation_and_cleaning/reports/keep/**
+
+### ---- Archives ----
+*.zip

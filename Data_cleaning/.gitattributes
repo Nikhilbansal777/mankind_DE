@@ -1,0 +1,22 @@
+# Normalize line endings
+* text=auto
+
+# Treat these as text explicitly
+*.py     text
+*.json   text
+*.yaml   text
+*.yml    text
+*.sql    text
+*.md     text
+*.sh     text
+*.ps1    text
+
+# Binary formats (never end-of-line normalize)
+*.parquet binary
+*.avro    binary
+*.orc     binary
+*.zip     binary
+
+# Optional: enforce LF in repo, let Git convert on checkout if needed
+# *.py     text eol=lf
+# *.sh     text eol=lf
