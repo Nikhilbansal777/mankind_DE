@@ -1,0 +1,3 @@
+{"event": "transform_batch_start", "plan": ["fact_sales_lines_enriched"], "ts": "2025-09-29T01:51:08Z", "run_id": "20250929T015108Z"}
+{"event": "transform_job_error", "job": "fact_sales_lines_enriched", "error": "Reference 'updated_at' is ambiguous, could be: updated_at, updated_at, updated_at.", "ts": "2025-09-29T01:51:17Z", "run_id": "20250929T015108Z"}
+{"event": "transform_batch_finish", "ok": 0, "errors": 1, "ts": "2025-09-29T01:51:18Z", "run_id": "20250929T015108Z"}

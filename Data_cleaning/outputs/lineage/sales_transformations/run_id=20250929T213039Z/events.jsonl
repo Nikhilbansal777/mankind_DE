@@ -1,0 +1,3 @@
+{"event": "transform_batch_start", "plan": ["payments_by_order_fact"], "ts": "2025-09-29T21:30:39Z", "run_id": "20250929T213039Z"}
+{"event": "transform_job_complete", "job": "payments_by_order_fact", "output": "E:\\MKM\\mankind_matrix_data_engineering\\Data_cleaning\\MKM_Glue_tranformations\\transformed_outputs\\sales_transformations\\facts\\payments_by_order\\run_id=20250929T213039Z", "ts": "2025-09-29T21:30:50Z", "run_id": "20250929T213039Z"}
+{"event": "transform_batch_finish", "ok": 1, "errors": 0, "ts": "2025-09-29T21:30:50Z", "run_id": "20250929T213039Z"}

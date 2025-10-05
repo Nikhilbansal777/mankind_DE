@@ -31,3 +31,42 @@ venv/
 # Misc
 .DS_Store
 *.zip
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.venv/
+venv/
+env/
+mankind_env/
+
+# Env & secrets
+*.env
+.env
+*.key
+*.pem
+
+# Spark/Hadoop scratch & big data formats
+spark-warehouse/
+metastore_db/
+.derby/
+_*               # Spark temp
+*.crc
+*.parquet
+*.snappy.parquet
+*.orc
+*.avro
+
+# Project outputs (heavy)
+Data_cleaning/MKM_Glue_tranformations/transformed_outputs/
+transformed_outputs/
+reports/logs/
