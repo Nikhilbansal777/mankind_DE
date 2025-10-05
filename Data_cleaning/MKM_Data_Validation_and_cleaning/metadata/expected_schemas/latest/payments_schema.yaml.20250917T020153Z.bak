@@ -1,0 +1,18 @@
+generated_at: 20250916T234958Z
+required: []
+optional:
+- amount
+- created_at
+- currency
+- description
+- id
+- metadata
+- provider
+- status
+- stripe_payment_intent_id
+- updated_at
+- user_id
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

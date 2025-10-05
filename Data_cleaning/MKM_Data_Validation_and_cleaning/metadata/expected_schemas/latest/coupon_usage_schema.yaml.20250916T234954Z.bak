@@ -1,0 +1,12 @@
+generated_at: 20250819T044738Z
+required: []
+optional:
+- coupon_id
+- id
+- order_id
+- used_at
+- user_id
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

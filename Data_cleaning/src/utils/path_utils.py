@@ -1,7 +1,6 @@
 # src/utils/path_utils.py
 
 
-# src/utils/path_utils.py
 """
 Path utilities for MKM pipelines.
 
@@ -10,6 +9,7 @@ Path utilities for MKM pipelines.
 - VALIDATION REPORTS (pre/post)     -> MKM_Data_Validation_and_cleaning/reports/validation_reports/<stage>/...
 - CLEANED OUTPUTS (CSV/Parquet)     -> MKM_Data_Validation_and_cleaning/reports/cleaned_outputs/...
 - SEMANTIC DATA (rollups/enrich)    -> transformed_outputs/semantic/<...>/...
+- SALES TRANSFORMATIONS (sales mart)-> MKM_Glue_tranformations/transformed_outputs/sales_transformations/<...>/...
 - SEMANTIC LINEAGE (audit/metrics)  -> outputs/lineage/semantic/<...>.json
 
 You can override the roots via .env:
@@ -17,10 +17,12 @@ You can override the roots via .env:
   OUT_ROOT_VALIDATION
   OUT_ROOT_CLEANED
   OUT_ROOT_SEMANTIC
+  OUT_ROOT_SALES_TRANSFORMATIONS
   OUT_ROOT_LINEAGE
 """
 
 import os
+from pathlib import Path
 from typing import Optional
 
 # Optional: allow env-based overrides without importing global settings at import time
@@ -85,13 +87,21 @@ def _root_cleaned() -> str:
     return load_env_and_get("OUT_ROOT_CLEANED", default)
 
 def _root_semantic() -> str:
-    default = _norm_join(get_project_root(), "transformed_outputs", "semantic")
+    default = _norm_join(get_project_root(), "MKM_Glue_tranformations", "transformed_outputs", "semantic")
     return load_env_and_get("OUT_ROOT_SEMANTIC", default)
+
+def _root_sales_transformations() -> str:
+    default = _norm_join(get_project_root(), "MKM_Glue_tranformations", "transformed_outputs", "sales_transformations")
+    return load_env_and_get("OUT_ROOT_SALES_TRANSFORMATIONS", default)
 
 def _root_lineage() -> str:
     # Keep your historical location but allow override
     default = _norm_join(get_project_root(), "outputs", "lineage")
     return load_env_and_get("OUT_ROOT_LINEAGE", default)
+
+# (Deprecated) generic transformations root — falls back to sales root if not set
+def _root_transformations() -> str:
+    return load_env_and_get("OUT_ROOT_TRANSFORMATIONS", _root_sales_transformations())
 
 
 # --------------------------------------------------------------------------------------
@@ -139,18 +149,32 @@ def cleaning_output_paths(table_name: str, file_format: str = "csv") -> str:
 # --------------------------------------------------------------------------------------
 # SEMANTIC (enrichments/joins/rollups) — DATA PRODUCTS
 # --------------------------------------------------------------------------------------
+
+def get_semantic_base() -> Path:
+    """
+    Base folder for semantic outputs as a Path object:
+      <project_root>/MKM_Glue_tranformations/transformed_outputs/semantic
+    """
+    return Path(_root_semantic())
+
 def get_semantic_output_path(*subpaths: str) -> str:
     """
     Root for SEMANTIC data products (what BI/Redshift should read).
     Typical layout:
-      transformed_outputs/semantic/<domain>/<dataset>/run_id=<UTCSTAMP>/data
+      MKM_Glue_tranformations/transformed_outputs/semantic/<domain>/<dataset>/run_id=<UTCSTAMP>/data
     Usage:
       data_dir = get_semantic_output_path("rollups", "daily_sales", "run_id=20250910T204705Z")
       df.write.parquet(os.path.join(data_dir, "data"))
+
+    Legacy compatibility: if a rollup passes (dataset, run_folder) separately
+    via older APIs, this still works because *subpaths are simply joined.
     """
-    final_path = _norm_join(_root_semantic(), *subpaths)
+    final_path = _norm_join(str(get_semantic_base()), *subpaths)
     _ensure_dir_for(final_path)
     return final_path
+    # final_path = _norm_join(_root_semantic(), *subpaths)
+    # _ensure_dir_for(final_path)
+    # return final_path
 
 
 def get_semantic_dataset_path(dataset: str, *subpaths: str) -> str:
@@ -176,6 +200,37 @@ def get_semantic_run_path(dataset: str, run_id: str, *subpaths: str) -> str:
 
 
 # --------------------------------------------------------------------------------------
+# SALES TRANSFORMATIONS (Sales data mart) — DATA PRODUCTS
+# --------------------------------------------------------------------------------------
+def get_sales_transform_output_path(*subpaths: str) -> str:
+    """
+    Root for SALES MART outputs:
+      MKM_Glue_tranformations/transformed_outputs/sales_transformations/<...>
+    """
+    final_path = _norm_join(_root_sales_transformations(), *subpaths)
+    _ensure_dir_for(final_path)
+    return final_path
+
+def get_sales_transform_run_path(dataset: str, run_id: str, *subpaths: str) -> str:
+    """
+    Enforce run_id convention for SALES MART:
+      transformed_outputs/sales_transformations/<dataset>/run_id=<run_id>/[<subpaths>...]
+    """
+    final_path = _norm_join(_root_sales_transformations(), dataset, f"run_id={run_id}", *subpaths)
+    _ensure_dir_for(final_path)
+    return final_path
+
+# Deprecated generic transformations helpers (kept for back-compat)
+def get_transform_output_path(*subpaths: str) -> str:
+    return _norm_join(_root_transformations(), *subpaths)
+
+def get_transform_run_path(dataset: str, run_id: str, *subpaths: str) -> str:
+    final_path = _norm_join(_root_transformations(), dataset, f"run_id={run_id}", *subpaths)
+    _ensure_dir_for(final_path)
+    return final_path
+
+
+# --------------------------------------------------------------------------------------
 # LINEAGE / AUDIT (metrics only, no raw data)
 # --------------------------------------------------------------------------------------
 def get_lineage_output_path(stage: str, *subpaths: str) -> str:
@@ -187,6 +242,7 @@ def get_lineage_output_path(stage: str, *subpaths: str) -> str:
       - 'validation'     (validators)
       - 'cleaning'       (cleaning QA)
       - 'semantic'       (rollups/enrichments audits)
+      - 'sales_transformations' (sales mart audits)
       - 'transformations' (generic)
     Usage:
       m = get_lineage_output_path("semantic", "daily_sales", "metrics_20250910.json")
@@ -221,6 +277,7 @@ def get_local_output_path(folder_name: str = "profiling_reports", sub_dir: str =
 # --------------------------------------------------------------------------------------
 # Simple guards (optional, use in critical scripts)
 # --------------------------------------------------------------------------------------
+
 def assert_is_semantic(path: str) -> None:
     """Raise if path does not clearly point to semantic outputs."""
     if "semantic" not in path.replace("\\", "/"):
@@ -241,8 +298,9 @@ USAGE_MAP = {
     "cleaners": "cleaning_output_paths(table_name, file_format)",
     "semantic_rollups_data": "get_semantic_output_path(...) or get_semantic_run_path(dataset, run_id, 'data')",
     "semantic_rollups_lineage": "get_lineage_output_path('semantic', <dataset>, <file>)",
+    "sales_mart_data": "get_sales_transform_output_path(...) or get_sales_transform_run_path(dataset, run_id, 'data')",
+    "sales_mart_lineage": "get_lineage_output_path('sales_transformations', <dataset>, <file>)",
 }
-
 
 
 

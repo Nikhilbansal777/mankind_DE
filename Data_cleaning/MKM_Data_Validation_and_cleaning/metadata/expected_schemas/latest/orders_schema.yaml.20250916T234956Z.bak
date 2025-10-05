@@ -1,0 +1,23 @@
+generated_at: 20250819T044745Z
+required: []
+optional:
+- cart_id
+- created_at
+- discounts
+- id
+- notes
+- order_number
+- payment_id
+- payment_status
+- shipping_address_id
+- shipping_value
+- status
+- subtotal
+- tax
+- total
+- updated_at
+- user_id
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

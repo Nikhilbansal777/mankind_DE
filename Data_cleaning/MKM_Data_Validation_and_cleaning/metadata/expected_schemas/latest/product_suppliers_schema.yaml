@@ -1,0 +1,9 @@
+generated_at: 20250917T020154Z
+required: []
+optional:
+- product_id
+- supplier_id
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

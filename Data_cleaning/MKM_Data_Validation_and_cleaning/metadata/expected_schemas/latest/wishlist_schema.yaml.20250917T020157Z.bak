@@ -1,0 +1,14 @@
+generated_at: 20250916T235002Z
+required: []
+optional:
+- brand
+- id
+- image_url
+- name
+- price
+- product_id
+- user_id
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

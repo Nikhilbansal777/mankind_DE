@@ -1,0 +1,20 @@
+generated_at: 20250917T020153Z
+required: []
+optional:
+- corporate_id
+- currency
+- discount_percent
+- effective_from
+- effective_to
+- id
+- lead_time_days
+- minimum_order_qty
+- price_in_cents
+- product_id
+- tier_pricing_json
+- updated_at
+- updated_by
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

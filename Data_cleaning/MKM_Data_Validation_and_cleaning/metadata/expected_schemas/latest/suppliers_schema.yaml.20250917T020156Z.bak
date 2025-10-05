@@ -1,0 +1,21 @@
+generated_at: 20250916T235001Z
+required: []
+optional:
+- address
+- city
+- contact_person
+- country
+- created_at
+- email
+- id
+- is_active
+- name
+- notes
+- phone
+- state
+- updated_at
+- zip_code
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

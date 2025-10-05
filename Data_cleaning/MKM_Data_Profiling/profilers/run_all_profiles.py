@@ -1,7 +1,16 @@
 # MKM_Data_Profiling/profilers/run_all_profiles.py
 
-import os, sys, yaml
+import os, yaml
 from _base_profile import profile_once
+from src.utils.lineage import get_run_id, write_run_manifest, write_event
+
+RUN_ID = get_run_id()
+
+# Create manifest once per process
+write_run_manifest("profiling", {
+    "job": "profiling/run_all_profiles.py",
+    "db_url": os.getenv("DB_URL"),
+}, run_id=RUN_ID)
 
 # Default config (used if YAML missing keys)
 DEFAULTS = {
@@ -40,14 +49,39 @@ def main():
             "users","products","category","address"
         ]
 
+    # ---- batch start event
+    write_event("profiling", {
+        "event": "profiling_batch_start",
+        "tables": tables,
+    }, run_id=RUN_ID)
+
     results = {}
     for t in tables:
         per_table_opts = _merge(DEFAULTS, (cfg.get("tables", {}).get(t) or {}))
         try:
             path = profile_once(t, logger_name=f"profilers.{t}", options=per_table_opts)
             results[t] = ("OK", path)
+            write_event("profiling", {
+                "event": "profile_complete",
+                "table": t,
+                "report_path": path,
+            }, run_id=RUN_ID)
         except Exception as e:
             results[t] = ("ERROR", str(e))
+            write_event("profiling", {
+                "event": "profile_error",
+                "table": t,
+                "error": str(e),
+            }, run_id=RUN_ID)
+
+    # ---- batch finish event
+    ok = sum(1 for s, _ in results.values() if s == "OK")
+    err = sum(1 for s, _ in results.values() if s == "ERROR")
+    write_event("profiling", {
+        "event": "profiling_batch_finish",
+        "ok": ok,
+        "errors": err,
+    }, run_id=RUN_ID)
 
     print("\n=== Profiling Summary ===")
     for t, (status, detail) in results.items():

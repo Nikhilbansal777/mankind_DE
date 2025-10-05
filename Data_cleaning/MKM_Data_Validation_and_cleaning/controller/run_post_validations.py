@@ -1,16 +1,88 @@
 # Data_cleaning/MKM_Data_Validation_and_cleaning/controller/run_post_validations.py
-import subprocess, sys
 
-TABLES = ["users", "products", "orders", "order_items", "payment", "wishlist"]
+import os, sys, subprocess
+CONTROLLER_DIR = os.path.abspath(os.path.dirname(__file__))
+ROOT = os.path.abspath(os.path.join(CONTROLLER_DIR, ".."))
+SCRIPT = os.path.join(ROOT, "validators", "post_validations", "post_validate_all.py")
+sys.exit(subprocess.call([sys.executable, SCRIPT] + sys.argv[1:]))
 
-def main():
-    for t in TABLES:
-        script = f"Data_cleaning/MKM_Data_Validation_and_cleaning/validators/post_validations/table_specific/postvalidate_{t}.py"
-        print(f"--> POST {t}")
-        subprocess.check_call([sys.executable, script])
 
-if __name__ == "__main__":
-    main()
+
+
+
+
+
+
+# # Data_cleaning/MKM_Data_Validation_and_cleaning/controller/run_post_validations.py
+# import os
+# import subprocess
+# import sys
+
+# # Controller dir  ->  .../MKM_Data_Validation_and_cleaning/controller
+# CONTROLLER_DIR = os.path.abspath(os.path.dirname(__file__))
+# CLEANING_ROOT = os.path.abspath(os.path.join(CONTROLLER_DIR, ".."))
+# POST_DIR = os.path.join(CLEANING_ROOT, "validators", "post_validations")
+
+# # Only tables that actually exist in your validators/post_validations as scripts
+# SAFE_TABLES = [
+#     "users",
+#     "products",
+#     "orders",
+#     "order_items",
+#     "order_status_history",
+#     "payment",
+#     "wishlist",
+#     # "order_payments",  # dropped table -> intentionally not included
+#     # "address", "category"  # add if/when scripts exist
+# ]
+
+# def _script_for(table: str) -> str:
+#     # your files are named like: postvalidate_<table>.py
+#     return os.path.join(POST_DIR, f"postvalidate_{table}.py")
+
+# def main():
+#     print("=== POST-VALIDATIONS ===")
+#     print(f"Root: {CLEANING_ROOT}\n")
+
+#     for t in SAFE_TABLES:
+#         script = _script_for(t)
+#         rel = os.path.relpath(script, CLEANING_ROOT)
+#         if not os.path.isfile(script):
+#             print(f"[SKIP] {t:22s} -> no script: {rel}")
+#             continue
+
+#         print(f"[RUN ] {t:22s} -> {rel}")
+#         subprocess.check_call([sys.executable, script])  # stop on first failure
+#         print(f"[OK  ] {t}")
+
+#     print("\nAll requested POST validations completed.")
+
+# if __name__ == "__main__":
+#     main()
+
+
+
+
+
+
+
+
+
+
+
+
+# import subprocess, sys
+
+# TABLES = ["users", "products", "orders", "order_items", "payment", "wishlist"]
+
+# def main():
+#     for t in TABLES:
+#         script = f"Data_cleaning/MKM_Data_Validation_and_cleaning/validators/post_validations/table_specific/postvalidate_{t}.py"
+#         print(f"--> POST {t}")
+#         subprocess.check_call([sys.executable, script])
+
+# if __name__ == "__main__":
+#     main()
 
 
 

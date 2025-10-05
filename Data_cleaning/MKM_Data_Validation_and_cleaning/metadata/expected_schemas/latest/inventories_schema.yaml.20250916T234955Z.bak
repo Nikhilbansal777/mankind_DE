@@ -1,0 +1,18 @@
+generated_at: 20250819T044740Z
+required: []
+optional:
+- active
+- available_quantity
+- created_at
+- currency
+- id
+- max_quantity_per_purchase
+- price
+- product_id
+- reserved_quantity
+- sold_quantity
+- updated_at
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

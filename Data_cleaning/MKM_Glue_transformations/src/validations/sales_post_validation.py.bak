@@ -1,0 +1,483 @@
+# sales_post_validation.py
+# Location: Data_cleaning/MKM_Glue_tranformations/src/validations/
+
+import os, sys, json, uuid
+from datetime import datetime
+from argparse import ArgumentParser
+from typing import Dict, Any
+
+# --- Path wiring for your repo layout ---------------------------------------
+# This script lives at:
+# Data_cleaning/MKM_Glue_tranformations/src/validations/sales_post_validation.py
+HERE = os.path.abspath(os.path.dirname(__file__))                          # .../src/validations
+GLUE_SRC = os.path.abspath(os.path.join(HERE, ".."))                       # .../src
+GLUE_ROOT = os.path.abspath(os.path.join(GLUE_SRC, ".."))                  # .../MKM_Glue_tranformations
+DATA_CLEANING = os.path.abspath(os.path.join(GLUE_ROOT, ".."))             # .../Data_cleaning
+REPO_ROOT = os.path.abspath(os.path.join(DATA_CLEANING, ".."))             # .../mankind_matrix_data_engineering
+
+# Ensure import order: Glue src (for 'src.*'), then Data_cleaning (for 'data_cleaning.*')
+for p in (GLUE_SRC, DATA_CLEANING, GLUE_ROOT, REPO_ROOT):
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
+# Import your bootstrap from Data_cleaning/
+from Data_cleaning.project_bootstrap import bootstrap_project_paths
+bootstrap_project_paths(__file__)   # will load .env and do any extra path setup
+# ---------------------------------------------------------------------------
+
+from pyspark.sql import functions as F, types as T
+from src.connections.db_connections import spark_session_for_JDBC  # now resolves
+try:
+    from src.utils.log_utils import get_logger
+except Exception:
+    import logging
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    get_logger = lambda name: logging.getLogger(name)
+
+
+# --- Defaults bound to your chosen folders ---------------------------------
+# Reports will be placed here by default (your preference)
+DEFAULT_REPORT_DIR = os.path.join(
+    GLUE_ROOT, "transformed_outputs", "Sales_transform_validation_reports"
+)
+
+# --- Helpers ----------------------------------------------------------------
+def _now_utc() -> str:
+    return datetime.utcnow().strftime("%Y-%m-%dT%H-%M-%SZ")
+
+def _ensure_dir(path: str):
+    os.makedirs(path, exist_ok=True)
+
+def _load_df(spark, path: str):
+    """Load JSON/CSV or a folder of JSON files (no Parquet as per your preference)."""
+    low = path.lower()
+    if os.path.isdir(path) or low.endswith(".json"):
+        return spark.read.json(path, multiLine=True)
+    if low.endswith(".csv"):
+        return spark.read.option("header", True).option("inferSchema", True).csv(path)
+    raise ValueError(f"Unsupported input type: {path}")
+
+def _normalize_month_start(col_name: str):
+    # Normalize to 'yyyy-MM-01' whether input is string/date/timestamp
+    return (
+        F.when(F.col(col_name).cast(T.DateType()).isNotNull(),
+               F.date_format(F.to_date(F.col(col_name)), "yyyy-MM-01"))
+         .otherwise(F.col(col_name).cast(T.StringType()))
+    )
+
+def _expected_months(last_n: int, anchor_first_of_month: str) -> list[str]:
+    """Pure-Python month list (no external deps). anchor like 'YYYY-MM-01'."""
+    y = int(anchor_first_of_month[0:4])
+    m = int(anchor_first_of_month[5:7])
+    anchor_idx = y * 12 + (m - 1)
+    start_idx = anchor_idx - (last_n - 1)
+    out = []
+    for idx in range(start_idx, anchor_idx + 1):
+        yy = idx // 12
+        mm = (idx % 12) + 1
+        out.append(f"{yy:04d}-{mm:02d}-01")
+    return out
+
+# --- Core validation --------------------------------------------------------
+def validate(
+    sales_path: str,
+    products_path: str | None,
+    order_items_path: str | None,
+    orders_path: str | None,
+    last_n_months: int = 12,
+    revenue_tolerance_pct: float = 1.0,
+) -> Dict[str, Any]:
+    logger = get_logger("sales_post_validation")
+    spark = spark_session_for_JDBC(app_name="MKM_SalesPostValidation")
+
+    # Load sales fact output
+    fact = _load_df(spark, sales_path)
+    # lower-case columns (safer joins)
+    fact = fact.select([F.col(c).alias(c.lower()) for c in fact.columns])
+
+    required = {"month_start", "product_id", "units_sold", "revenue"}
+    missing = required - set(fact.columns)
+    if missing:
+        raise ValueError(f"Missing required columns in sales fact: {missing}")
+
+    # Month normalization & anchor
+    fact = fact.withColumn("month_norm", _normalize_month_start("month_start"))
+    anchor = fact.select(F.max("month_norm").alias("m")).collect()[0]["m"]
+    if not anchor:
+        anchor = datetime.utcnow().strftime("%Y-%m-01")
+
+    expected = _expected_months(last_n_months, anchor)
+    present = [r["month_norm"] for r in fact.select("month_norm").distinct().collect()]
+    missing_months = [m for m in expected if m not in present]
+
+    # Non-negative checks
+    negatives_cnt = fact.filter((F.col("units_sold") < 0) | (F.col("revenue") < 0)).count()
+
+    # FK to products (optional)
+    fk_missing_cnt, fk_samples = 0, []
+    if products_path:
+        products_df = _load_df(spark, products_path)
+        products_df = products_df.select([F.col(c).alias(c.lower()) for c in products_df.columns])
+        key_col = "product_id" if "product_id" in products_df.columns else "id"
+        fk_missing = (fact.select("product_id").distinct()
+                          .join(products_df.select(F.col(key_col).alias("product_id")).distinct(),
+                                on="product_id", how="left_anti"))
+        fk_missing_cnt = fk_missing.count()
+        fk_samples = [r["product_id"] for r in fk_missing.limit(20).collect()]
+
+    # Revenue reconciliation (optional)
+    recon_fail_cnt, recon_examples = None, []
+    if order_items_path and orders_path:
+        oi = _load_df(spark, order_items_path).select(
+            F.col("order_id").alias("order_id"),
+            F.col("product_id").alias("product_id"),
+            F.col("quantity").cast("double").alias("quantity"),
+            F.col("unit_price").cast("double").alias("unit_price"),
+        )
+        od = _load_df(spark, orders_path).select(
+            F.col("order_id").alias("order_id"),
+            F.to_date("order_date").alias("order_date"),
+        )
+
+        oi2 = (oi.join(od, "order_id", "inner")
+                 .withColumn("month_norm", F.date_format("order_date", "yyyy-MM-01"))
+                 .groupBy("product_id", "month_norm")
+                 .agg(F.sum(F.col("quantity") * F.col("unit_price")).alias("rev_src")))
+
+        fact_cmp = (fact.groupBy("product_id", "month_norm").agg(F.sum("revenue").alias("rev_fact"))
+                        .join(oi2, on=["product_id", "month_norm"], how="outer")
+                        .fillna({"rev_fact": 0.0, "rev_src": 0.0})
+                        .withColumn(
+                            "pct_diff",
+                            F.when(F.col("rev_src") == 0,
+                                   F.when(F.col("rev_fact") == 0, F.lit(0.0)).otherwise(F.lit(100.0)))
+                             .otherwise(F.abs(F.col("rev_fact") - F.col("rev_src")) / F.col("rev_src") * 100.0)
+                        ))
+
+        bad = fact_cmp.filter(F.col("pct_diff") > revenue_tolerance_pct)
+        recon_fail_cnt = bad.count()
+        recon_examples = [row.asDict() for row in bad.limit(10).collect()]
+
+    # Decision
+    passed, reasons = True, []
+    if missing_months:
+        passed = False; reasons.append(f"Missing months (last {last_n_months}): {missing_months[:6]}{'...' if len(missing_months)>6 else ''}")
+    if negatives_cnt > 0:
+        passed = False; reasons.append(f"Negative metrics rows: {negatives_cnt}")
+    if products_path and fk_missing_cnt > 0:
+        passed = False; reasons.append(f"FK missing products: {fk_missing_cnt}")
+    if (order_items_path and orders_path) and (recon_fail_cnt is not None) and (recon_fail_cnt > 0):
+        passed = False; reasons.append(f"Revenue reconciliation mismatches: {recon_fail_cnt} rows > {revenue_tolerance_pct}% diff")
+
+    totals = fact.count()
+    by_month = [r.asDict() for r in fact.groupBy("month_norm").agg(F.count("*").alias("rows")).orderBy("month_norm").collect()]
+
+    return {
+        "run_id": str(uuid.uuid4()),
+        "timestamp_utc": _now_utc(),
+        "inputs": {
+            "sales_path": sales_path,
+            "products_path": products_path,
+            "order_items_path": order_items_path,
+            "orders_path": orders_path
+        },
+        "checks": {
+            "month_continuity": {"anchor_month": anchor, "expected_last_n_months": last_n_months, "missing_months": missing_months},
+            "non_negative_metrics": {"negative_rows": negatives_cnt},
+            "fk_products": {"executed": bool(products_path), "missing_product_ids_count": fk_missing_cnt, "sample_missing_product_ids": fk_samples},
+            "revenue_reconciliation": {"executed": bool(order_items_path and orders_path), "tolerance_pct": revenue_tolerance_pct, "mismatch_rows": recon_fail_cnt, "examples": recon_examples[:5]}
+        },
+        "fact_overview": {"total_rows": totals, "rows_by_month": by_month},
+        "result": {"status": "SUCCESS" if passed else "FAILURE", "reasons": reasons}
+    }
+
+# --- CLI --------------------------------------------------------------------
+def main():
+    parser = ArgumentParser(description="MKM Sales Post-Validation (local)")
+    parser.add_argument("--sales_path", required=True, help="Sales fact output path (JSON/CSV or folder)")
+    parser.add_argument("--products_path", required=False, help="Products dataset path (for FK check)")
+    parser.add_argument("--order_items_path", required=False, help="Order items path (for reconciliation)")
+    parser.add_argument("--orders_path", required=False, help="Orders path (for reconciliation)")
+    parser.add_argument("--last_n_months", type=int, default=12)
+    parser.add_argument("--revenue_tolerance_pct", type=float, default=1.0)
+    parser.add_argument("--report_dir", default=DEFAULT_REPORT_DIR)
+    args = parser.parse_args()
+
+    logger = get_logger("sales_post_validation_main")
+    _ensure_dir(args.report_dir)
+
+    report = validate(
+        sales_path=args.sales_path,
+        products_path=args.products_path,
+        order_items_path=args.order_items_path,
+        orders_path=args.orders_path,
+        last_n_months=args.last_n_months,
+        revenue_tolerance_pct=args.revenue_tolerance_pct
+    )
+
+    out_path = os.path.join(args.report_dir, f"sales_post_validation_{report['run_id']}.json")
+    with open(out_path, "w", encoding="utf-8") as f:
+        json.dump(report, f, indent=2)
+
+    status = report["result"]["status"]
+    logger.info(f"POST_VALIDATION_STATUS={status} REPORT_PATH={out_path}")
+    print(json.dumps({"status": status, "report_path": out_path}, indent=2))
+    sys.exit(0 if status == "SUCCESS" else 1)
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# # sales_post_validation.py
+# # Keep style consistent with existing scripts
+
+# import os, sys, json, uuid
+# from datetime import datetime
+# from argparse import ArgumentParser
+# from typing import Dict, Any
+
+# import os, sys
+
+# # file is at: ...\Data_cleaning\MKM_Glue_tranformations\src\validations\sales_post_validation.py
+# PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))  # ...\MKM_Glue_tranformations
+# if PROJECT_ROOT not in sys.path:
+#     sys.path.insert(0, PROJECT_ROOT)
+
+# from project_bootstrap import bootstrap_project_paths
+# bootstrap_project_paths(__file__)
+
+# # also ensure repo root is visible so `from src.*` resolves to the top-level src
+# REPO_ROOT = os.path.abspath(os.path.join(PROJECT_ROOT, "..", ".."))  # ...\mankind_matrix_data_engineering
+# if REPO_ROOT not in sys.path:
+#     sys.path.insert(0, REPO_ROOT)
+
+
+# # # --- Project bootstrapping for src/* imports (your style) ---
+# # PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))  # .../MKM_Glue_tranformations
+# # if PROJECT_ROOT not in sys.path:
+# #     sys.path.insert(0, PROJECT_ROOT)
+
+# # from project_bootstrap import bootstrap_project_paths
+# # bootstrap_project_paths(__file__)
+# # # --- End bootstrapping ---
+
+# # # Ensure repo-level src wins over job-local src (fixes ModuleNotFoundError: src.connections)
+# # REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))  # .../mankind_matrix_data_engineering
+# # if REPO_ROOT not in sys.path:
+# #     sys.path.insert(0, REPO_ROOT)  # put first so `from src...` resolves to repo-level src
+
+# # --- Imports from your repo-level src ---
+# from pyspark.sql import functions as F, types as T
+# from src.connections.db_connections import spark_session_for_JDBC  # <- keep your function name
+# from src.utils.log_utils import get_logger
+
+# # --- Defaults bound to your chosen folders ---
+# GLUE_ROOT = PROJECT_ROOT  # .../Data_cleaning/MKM_Glue_tranformations
+# DEFAULT_REPORT_DIR = os.path.join(GLUE_ROOT, "transformed_outputs", "Sales_transform_validation_reports")
+
+# # ---------- Helpers ----------
+# def _now_utc() -> str:
+#     return datetime.utcnow().strftime("%Y-%m-%dT%H-%M-%SZ")
+
+# def _ensure_dir(path: str):
+#     os.makedirs(path, exist_ok=True)
+
+# def _load_df(spark, path: str):
+#     """Load JSON/CSV or a folder of JSON files (no Parquet)."""
+#     low = path.lower()
+#     if os.path.isdir(path) or low.endswith(".json"):
+#         return spark.read.json(path, multiLine=True)
+#     if low.endswith(".csv"):
+#         return spark.read.option("header", True).option("inferSchema", True).csv(path)
+#     raise ValueError(f"Unsupported input type: {path}")
+
+# def _normalize_month_start(col_name: str):
+#     # Normalize to 'yyyy-MM-01' whether input is string/date/timestamp
+#     return (
+#         F.when(F.col(col_name).cast(T.DateType()).isNotNull(),
+#                F.date_format(F.to_date(F.col(col_name)), "yyyy-MM-01"))
+#          .otherwise(F.col(col_name).cast(T.StringType()))
+#     )
+
+# def _expected_months(last_n: int, anchor_first_of_month: str) -> list[str]:
+#     """Pure-Python month list (no external deps). anchor like 'YYYY-MM-01'."""
+#     y = int(anchor_first_of_month[0:4])
+#     m = int(anchor_first_of_month[5:7])
+#     anchor_idx = y * 12 + (m - 1)
+#     start_idx = anchor_idx - (last_n - 1)
+#     out = []
+#     for idx in range(start_idx, anchor_idx + 1):
+#         yy = idx // 12
+#         mm = (idx % 12) + 1
+#         out.append(f"{yy:04d}-{mm:02d}-01")
+#     return out
+
+# # ---------- Core validation ----------
+# def validate(
+#     sales_path: str,
+#     products_path: str | None,
+#     order_items_path: str | None,
+#     orders_path: str | None,
+#     last_n_months: int = 12,
+#     revenue_tolerance_pct: float = 1.0,
+# ) -> Dict[str, Any]:
+#     logger = get_logger("sales_post_validation")
+#     spark = spark_session_for_JDBC(app_name="MKM_SalesPostValidation")
+
+#     fact = _load_df(spark, sales_path)
+#     # lower-case columns (safe joins)
+#     fact = fact.select([F.col(c).alias(c.lower()) for c in fact.columns])
+
+#     required = {"month_start", "product_id", "units_sold", "revenue"}
+#     missing = required - set(fact.columns)
+#     if missing:
+#         raise ValueError(f"Missing required columns in sales fact: {missing}")
+
+#     # Month normalization & anchor
+#     fact = fact.withColumn("month_norm", _normalize_month_start("month_start"))
+#     anchor = fact.select(F.max("month_norm").alias("m")).collect()[0]["m"] or datetime.utcnow().strftime("%Y-%m-01")
+
+#     expected = _expected_months(last_n_months, anchor)
+#     present = [r["month_norm"] for r in fact.select("month_norm").distinct().collect()]
+#     missing_months = [m for m in expected if m not in present]
+
+#     # Non-negative metrics
+#     negatives_cnt = fact.filter((F.col("units_sold") < 0) | (F.col("revenue") < 0)).count()
+
+#     # FK to products (optional)
+#     fk_missing_cnt, fk_samples = 0, []
+#     if products_path:
+#         products = _load_df(spark, products_path).select([F.col(c).alias(c.lower()) for c in _load_df(spark, products_path).columns])
+#         key_col = "product_id" if "product_id" in products.columns else "id"
+#         fk_missing = (fact.select("product_id").distinct()
+#                           .join(products.select(F.col(key_col).alias("product_id")).distinct(),
+#                                 on="product_id", how="left_anti"))
+#         fk_missing_cnt = fk_missing.count()
+#         fk_samples = [r["product_id"] for r in fk_missing.limit(20).collect()]
+
+#     # Revenue reconciliation (optional)
+#     recon_fail_cnt, recon_examples = None, []
+#     if order_items_path and orders_path:
+#         oi = _load_df(spark, order_items_path).select(
+#             F.col("order_id").alias("order_id"),
+#             F.col("product_id").alias("product_id"),
+#             F.col("quantity").cast("double").alias("quantity"),
+#             F.col("unit_price").cast("double").alias("unit_price"),
+#         )
+#         od = _load_df(spark, orders_path).select(
+#             F.col("order_id").alias("order_id"),
+#             F.to_date("order_date").alias("order_date"),
+#         )
+
+#         oi2 = (oi.join(od, "order_id", "inner")
+#                  .withColumn("month_norm", F.date_format("order_date", "yyyy-MM-01"))
+#                  .groupBy("product_id", "month_norm")
+#                  .agg(F.sum(F.col("quantity") * F.col("unit_price")).alias("rev_src")))
+
+#         fact_cmp = (fact.groupBy("product_id", "month_norm").agg(F.sum("revenue").alias("rev_fact"))
+#                         .join(oi2, on=["product_id", "month_norm"], how="outer")
+#                         .fillna({"rev_fact": 0.0, "rev_src": 0.0})
+#                         .withColumn(
+#                             "pct_diff",
+#                             F.when(F.col("rev_src") == 0, F.when(F.col("rev_fact") == 0, F.lit(0.0)).otherwise(F.lit(100.0)))
+#                              .otherwise(F.abs(F.col("rev_fact") - F.col("rev_src")) / F.col("rev_src") * 100.0)
+#                         ))
+
+#         bad = fact_cmp.filter(F.col("pct_diff") > revenue_tolerance_pct)
+#         recon_fail_cnt = bad.count()
+#         recon_examples = [row.asDict() for row in bad.limit(10).collect()]
+
+#     # Decision
+#     passed, reasons = True, []
+#     if missing_months:
+#         passed = False; reasons.append(f"Missing months (last {last_n_months}): {missing_months[:6]}{'...' if len(missing_months)>6 else ''}")
+#     if negatives_cnt > 0:
+#         passed = False; reasons.append(f"Negative metrics rows: {negatives_cnt}")
+#     if products_path and fk_missing_cnt > 0:
+#         passed = False; reasons.append(f"FK missing products: {fk_missing_cnt}")
+#     if (order_items_path and orders_path) and (recon_fail_cnt is not None) and (recon_fail_cnt > 0):
+#         passed = False; reasons.append(f"Revenue reconciliation mismatches: {recon_fail_cnt} rows > {revenue_tolerance_pct}% diff")
+
+#     totals = fact.count()
+#     by_month = [r.asDict() for r in fact.groupBy("month_norm").agg(F.count("*").alias("rows")).orderBy("month_norm").collect()]
+
+#     return {
+#         "run_id": str(uuid.uuid4()),
+#         "timestamp_utc": _now_utc(),
+#         "inputs": {
+#             "sales_path": sales_path,
+#             "products_path": products_path,
+#             "order_items_path": order_items_path,
+#             "orders_path": orders_path
+#         },
+#         "checks": {
+#             "month_continuity": {"anchor_month": anchor, "expected_last_n_months": last_n_months, "missing_months": missing_months},
+#             "non_negative_metrics": {"negative_rows": negatives_cnt},
+#             "fk_products": {"executed": bool(products_path), "missing_product_ids_count": fk_missing_cnt, "sample_missing_product_ids": fk_samples},
+#             "revenue_reconciliation": {"executed": bool(order_items_path and orders_path), "tolerance_pct": revenue_tolerance_pct, "mismatch_rows": recon_fail_cnt, "examples": recon_examples[:5]}
+#         },
+#         "fact_overview": {"total_rows": totals, "rows_by_month": by_month},
+#         "result": {"status": "SUCCESS" if passed else "FAILURE", "reasons": reasons}
+#     }
+
+# def main():
+#     parser = ArgumentParser(description="MKM Sales Post-Validation (local)")
+#     parser.add_argument("--sales_path", required=True, help="Sales fact output path (JSON/CSV or folder)")
+#     parser.add_argument("--products_path", required=False, help="Products dataset path (for FK check)")
+#     parser.add_argument("--order_items_path", required=False, help="Order items path (for reconciliation)")
+#     parser.add_argument("--orders_path", required=False, help="Orders path (for reconciliation)")
+#     parser.add_argument("--last_n_months", type=int, default=12)
+#     parser.add_argument("--revenue_tolerance_pct", type=float, default=1.0)
+#     parser.add_argument("--report_dir", default=DEFAULT_REPORT_DIR)
+#     args = parser.parse_args()
+
+#     logger = get_logger("sales_post_validation_main")
+#     _ensure_dir(args.report_dir)
+
+#     report = validate(
+#         sales_path=args.sales_path,
+#         products_path=args.products_path,
+#         order_items_path=args.order_items_path,
+#         orders_path=args.orders_path,
+#         last_n_months=args.last_n_months,
+#         revenue_tolerance_pct=args.revenue_tolerance_pct
+#     )
+
+#     out_path = os.path.join(args.report_dir, f"sales_post_validation_{report['run_id']}.json")
+#     with open(out_path, "w", encoding="utf-8") as f:
+#         json.dump(report, f, indent=2)
+
+#     status = report["result"]["status"]
+#     logger.info(f"POST_VALIDATION_STATUS={status} REPORT_PATH={out_path}")
+#     print(json.dumps({"status": status, "report_path": out_path}, indent=2))
+#     sys.exit(0 if status == "SUCCESS" else 1)
+
+# if __name__ == "__main__":
+#     main()

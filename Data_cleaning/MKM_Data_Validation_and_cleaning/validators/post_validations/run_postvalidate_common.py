@@ -10,13 +10,17 @@ from project_bootstrap import bootstrap_project_paths
 bootstrap_project_paths(__file__)
 # ------------------------------------
 
+from src.utils.lineage import get_run_id, write_run_manifest, write_event
+RUN_ID = get_run_id()
+
+
 from typing import Dict, List, Any, Optional, Tuple
 from datetime import datetime, timezone
 
 from pyspark.sql import SparkSession
 from src.connections.db_connections import spark_session_for_JDBC
 from src.utils.config_loader import load_env_and_get
-from src.utils.path_utils import cleaning_output_paths, get_validation_report_path, get_lineage_path
+from src.utils.path_utils import cleaning_output_paths, get_validation_report_path, get_lineage_output_path
 
 # import checks from your toolbox package (relative import)
 from .post_validator_common.post_validation_checks import (
@@ -69,6 +73,8 @@ def _write_json(obj: Dict[str, Any], phase_dir: str, filename: str):
     with open(out, "w", encoding="utf-8") as f:
         json.dump(obj, f, indent=2, default=str)
     return out
+
+
 
 def run_postvalidate(
     TABLE: str,
@@ -202,14 +208,30 @@ def run_postvalidate(
         out = _write_json(report, "post_validation_reports", f"{TABLE}_post_validation.json")
         print(f"[POST-VALIDATION] ✅ saved: {out}")
 
+        
+        # ensure per-run manifest
+        write_run_manifest("validation", {
+            "job": "validators/post_validations/run_postvalidate_common.py"
+        }, run_id=RUN_ID)
+
+        # write a simple post-validation event
+        write_event("validation", {
+            "event": "post_validate_complete",
+            "table": TABLE,
+            "report_path": out,           # whatever variable you used for the saved JSON
+            "rows_checked": row_count,         # if you have it in scope; otherwise omit
+            "status": "ok"                     # or "issues_found" if you have a flag
+        }, run_id=RUN_ID)
+
         # Also write a lineage JSON (same payload; downstream can read samples from here)
-        lineage_out = get_lineage_path(f"{TABLE}_lineage.json")
+        lineage_out = get_lineage_output_path(f"{TABLE}_lineage.json")
         with open(lineage_out, "w", encoding="utf-8") as f:
             json.dump(report, f, indent=2, default=str)
-        print(f"[POST-VALIDATION] 🧭 lineage saved: {lineage_out}")
+        print(f"[POST-VALIDATION] lineage saved: {lineage_out}")
 
 
         return report
+    
     finally:
         spark.stop()
 

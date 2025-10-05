@@ -33,7 +33,7 @@ tables:
       sample_fraction: 0.25
 
   category:
-    value_frequencies:
+    value_frequencies: {}
       # use defaults
 
   address:
