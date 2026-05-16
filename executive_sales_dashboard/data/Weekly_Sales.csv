@@ -1,0 +1,4 @@
+product,year,week_number,total_quantity,total_revenue
+"GeForce RTX 4070 Family",2025,36,2,1999.98
+"NVIDIA L4 GPU",2025,36,1,23.5
+"Jetson Orin Nano Super Developer Kit",2025,42,1,1499.99
