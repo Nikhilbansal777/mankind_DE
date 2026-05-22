@@ -24,7 +24,7 @@ KAFKA_CONFIG = {
     'value_serializer': lambda x: json.dumps(x).encode('utf-8'),
     'value_deserializer': lambda m: json.loads(m.decode('utf-8'))
 }
-
+ 
 TOPICS = {
     'user_events': 'user-events',
     'recommendations': 'recommendations',
@@ -34,7 +34,7 @@ TOPICS = {
 class AIRecommendationConsumer:
     """
     Kafka consumer that processes user events and generates AI-powered recommendations
-    """
+    """ 
     
     def __init__(self, product_catalog: List[Dict[str, Any]]):
         """
