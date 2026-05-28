@@ -1,0 +1,84 @@
+### ---- OS / Editors ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+
+### ---- Python / Build Artifacts ----
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+
+### ---- Virtual Envs ----
+.venv/
+venv/
+env/
+mankind_env/
+
+### ---- Secrets / Env ----
+.env
+**/.env
+*.env
+*.key
+*.pem
+
+### ---- Notebooks ----
+.ipynb_checkpoints/
+
+### ---- Logs / Temp ----
+*.log
+*.tmp
+logs/
+reports/logs/
+spark_temp_cleanup/
+
+### ---- Spark / Hadoop scratch ----
+spark-warehouse/
+metastore_db/
+.derby/
+_*                 # Spark temp files
+**/_SUCCESS
+**/*.crc
+
+### ---- Columnar / Big data formats (generated) ----
+*.parquet
+*.snappy.parquet
+*.orc
+*.avro
+
+### ---- Project Outputs (generated; keep source small) ----
+# Generic generated outputs
+transformed_outputs/
+Data_cleaning/MKM_Glue_tranformations/transformed_outputs/
+
+# Validation & cleaning outputs (adjust to your actual paths)
+MKM_Data_Validation_and_cleaning/cleaned_outputs/
+MKM_Data_Validation_and_cleaning/reports/
+MKM_Data_Validation_and_cleaning/tmp/
+
+# Profiling reports can get huge; default ignore
+MKM_Data_Profiling/profiling_reports/
+
+### ---- Data dumps (default ignore) ----
+*.sqlite
+*.csv
+*.json
+
+# ---- Keep config & schema under version control (override ignores) ----
+# Keep config & schema JSON/YAML in src/config and similar
+!src/config/**
+!**/config/*.json
+!**/config/*.yaml
+!**/config/*.yml
+
+# If you want to version a small curated subset of profiling/validation, un-comment the below
+# !MKM_Data_Profiling/profiling_reports/keep/**
+# !MKM_Data_Validation_and_cleaning/reports/keep/**
+
+### ---- Archives ----
+*.zip

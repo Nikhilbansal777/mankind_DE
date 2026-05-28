@@ -1,0 +1,18 @@
+generated_at: 20250819T044747Z
+required: []
+optional:
+- amount
+- created_at
+- currency
+- id
+- order_id
+- payment_gateway
+- payment_method
+- payment_status
+- transaction_id
+- updated_at
+- user_id
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

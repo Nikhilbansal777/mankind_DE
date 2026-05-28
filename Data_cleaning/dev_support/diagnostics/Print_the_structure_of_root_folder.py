@@ -3,7 +3,7 @@ import os
 
 def print_tree(startpath, prefix=""):
     for item in os.listdir(startpath):
-        if item == "mankind_env":
+        if item == "mankind_env" or item == "venv":
             continue  # Skip the mankind_env folder
         path = os.path.join(startpath, item)
         if os.path.isdir(path):

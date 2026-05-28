@@ -27,7 +27,7 @@ from MKM_Data_Profiling.profilers.profilers_common.distinct_counts import get_di
 from MKM_Data_Profiling.profilers.profilers_common.value_frequencies import get_value_frequencies
 
 
-def run_common_profilers(df, table_name: str) -> dict:
+def run_common_profilers(df, table_name: str, options: dict | None = None) -> dict:
     """
     Execute the standard profiling suite on a Spark DataFrame and return a Python dict.
 
@@ -42,16 +42,22 @@ def run_common_profilers(df, table_name: str) -> dict:
     """
     if df is None:
         raise ValueError("[ERROR] run_common_profilers got df=None")
+    
+    opts = options or {}
+    # If a cheaper DF for value_frequencies was provided by the controller, use it
+    vf_df = opts.get("value_frequencies_df", df)
 
-    return {
+    result = {
         "table": table_name,
         "timestamp": datetime.now(timezone.utc).isoformat(),  # stable across machines
         "data_types": get_column_data_types(df),
         "null_counts": get_null_counts(df),
         "column_stats": get_column_stats(df),
         "distinct_counts": get_distinct_counts(df),
-        "value_frequencies": get_value_frequencies(df),
+        # value_frequencies can be expensive; controller may pass a filtered/sample df
+        "value_frequencies": get_value_frequencies(vf_df) if vf_df is not None else {},
     }
+    return result
 
 
 def sanitize_summary(summary_dict: dict) -> dict:

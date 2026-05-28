@@ -1,79 +1,91 @@
 # MKM_Data_Profiling/profilers/products_profile.py
 
-import sys
-import os
-import json
-from datetime import datetime, timezone
-
-# --- Temporary path injection ---
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
-
-from project_bootstrap import bootstrap_project_paths
-bootstrap_project_paths(__file__)
-# --- End path injection ---
-
-from src.connections.db_connections import spark_session_for_JDBC
-from src.utils.config_loader import load_env_and_get
-from src.utils.path_utils import get_local_output_path
-from src.utils.log_utils import get_logger
-from src.utils import file_io
-from MKM_Data_Profiling.profilers.all_common_profilers import run_common_profilers, sanitize_summary
-
-logger = get_logger("profilers.products")
-
-def _ts() -> str:
-    return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-
-def profile_products_table():
-    # Load environment variables
-    load_env_and_get()
-
-    # Start Spark session with JDBC support
-    spark = spark_session_for_JDBC()
-
-    jdbc_url = load_env_and_get("DB_URL")
-    props = {
-        "user": load_env_and_get("DB_USERNAME"),
-        "password": load_env_and_get("DB_PASSWORD"),
-        "driver": "com.mysql.cj.jdbc.Driver"
-    }
-
-    run_id = _ts()
-    try:
-        # Step 1: Read the `products` table
-        logger.info("starting profiling", extra={"run_id": run_id, "table": "products"})
-        df = spark.read.jdbc(url=jdbc_url, table="products", properties=props)
-        logger.info("loaded table", extra={"table": "products"})
-        print("[INFO] Loaded 'products' table")
-
-        # Step 2: Run reusable profilers
-        raw_summary = run_common_profilers(df, table_name="products")
-
-        # Step 3: Sanitize complex datatypes for JSON compatibility
-        summary = sanitize_summary(raw_summary)
-
-        # Step 4: Determine output path
-        output_dir = get_local_output_path("profiling_reports/profiling")
-        os.makedirs(output_dir, exist_ok=True)
-        output_path = os.path.join(output_dir, f"products_profile_{run_id}.json")
-
-        # Step 5: Save as JSON
-        file_io.write_json(summary, output_path)
-        logger.info("profiling saved", extra={"table": "products", "path": output_path, "run_id": run_id})
-        print(f"[SUCCESS] Profiling report saved to: {output_path}")
-
-    except Exception as e:
-        logger.error(f"profiling failed: {e}", extra={"table": "products", "run_id": run_id})
-        print(f"[ERROR] Profiling failed for products: {e}")
-        raise
-
-    finally:
-        spark.stop()
-        logger.info("spark session stopped", extra={"table": "products", "run_id": run_id})
-        print("[INFO] Spark session stopped.")
-
-
+# products_profile.py
+from _base_profile import profile_once
 if __name__ == "__main__":
-    profile_products_table()
+    profile_once("products", logger_name="profilers.products")
+
+
+
+
+
+# #-------------Fall back code for individual table profiling----------------
+# import sys
+# import os
+# import json
+# from datetime import datetime, timezone
+
+# # --- Temporary path injection ---
+# project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+# if project_root not in sys.path:
+#     sys.path.insert(0, project_root)
+
+# from project_bootstrap import bootstrap_project_paths
+# bootstrap_project_paths(__file__)
+# # --- End path injection ---
+
+# from src.connections.db_connections import spark_session_for_JDBC
+# from src.utils.config_loader import load_env_and_get
+# from src.utils.path_utils import get_local_output_path
+# from src.utils.log_utils import get_logger
+# from src.utils import file_io
+# from MKM_Data_Profiling.profilers.all_common_profilers import run_common_profilers, sanitize_summary
+
+# logger = get_logger("profilers.products")
+
+# def _ts() -> str:
+#     return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+
+# def profile_products_table():
+#     # Load environment variables
+#     load_env_and_get()
+
+#     # Start Spark session with JDBC support
+#     spark = spark_session_for_JDBC()
+
+#     jdbc_url = load_env_and_get("DB_URL")
+#     props = {
+#         "user": load_env_and_get("DB_USERNAME"),
+#         "password": load_env_and_get("DB_PASSWORD"),
+#         "driver": "com.mysql.cj.jdbc.Driver"
+#     }
+
+#     run_id = _ts()
+#     try:
+#         # Step 1: Read the `products` table
+#         logger.info("starting profiling", extra={"run_id": run_id, "table": "products"})
+#         df = spark.read.jdbc(url=jdbc_url, table="products", properties=props)
+#         logger.info("loaded table", extra={"table": "products"})
+#         print("[INFO] Loaded 'products' table")
+
+#         # Step 2: Run reusable profilers
+#         raw_summary = run_common_profilers(df, table_name="products")
+
+#         # Step 3: Sanitize complex datatypes for JSON compatibility
+#         summary = sanitize_summary(raw_summary)
+
+#         # Step 4: Determine output path
+#         output_dir = get_local_output_path("profiling_reports/profiling")
+#         os.makedirs(output_dir, exist_ok=True)
+#         output_path = os.path.join(output_dir, f"products_profile_{run_id}.json")
+
+#         # Step 5: Save as JSON
+#         file_io.write_json(summary, output_path)
+#         logger.info("profiling saved", extra={"table": "products", "path": output_path, "run_id": run_id})
+#         print(f"[SUCCESS] Profiling report saved to: {output_path}")
+
+#     except Exception as e:
+#         logger.error(f"profiling failed: {e}", extra={"table": "products", "run_id": run_id})
+#         print(f"[ERROR] Profiling failed for products: {e}")
+#         raise
+
+#     finally:
+#         spark.stop()
+#         logger.info("spark session stopped", extra={"table": "products", "run_id": run_id})
+#         print("[INFO] Spark session stopped.")
+
+
+# if __name__ == "__main__":
+#     profile_products_table()
+
+# #-------------Fall back code for individual table profiling----------------

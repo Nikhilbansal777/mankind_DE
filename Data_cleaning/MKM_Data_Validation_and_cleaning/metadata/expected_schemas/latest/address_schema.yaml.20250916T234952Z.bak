@@ -1,0 +1,18 @@
+generated_at: 20250819T044733Z
+required: []
+optional:
+- address_type
+- city
+- country
+- created_at
+- id
+- is_default
+- postal_code
+- state
+- street_address
+- updated_at
+- user_id
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

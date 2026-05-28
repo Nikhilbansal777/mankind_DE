@@ -1,0 +1,12 @@
+generated_at: 20250917T020157Z
+required: []
+optional:
+- product
+- total_quantity
+- total_revenue
+- week_number
+- year
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

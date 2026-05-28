@@ -1,0 +1,17 @@
+generated_at: 20250819T044741Z
+required: []
+optional:
+- action_type
+- cart_id
+- created_at
+- created_by
+- description
+- id
+- inventory_id
+- order_id
+- quantity
+- user_id
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

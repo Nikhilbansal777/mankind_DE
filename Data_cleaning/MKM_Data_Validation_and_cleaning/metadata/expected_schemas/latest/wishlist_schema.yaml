@@ -1,15 +1,12 @@
-generated_at: 20250819T044800Z
+generated_at: 20250917T020157Z
 required: []
 optional:
 - brand
-- discounted_price
 - id
 - image_url
 - name
 - price
 - product_id
-- rating
-- review_count
 - user_id
 disallowed: []
 _meta:

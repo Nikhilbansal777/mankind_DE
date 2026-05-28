@@ -1,0 +1,5 @@
+{"event": "semantic_batch_start", "plan": ["order_summary", "order_status_by_order", "user_order_activity"], "ts": "2025-09-25T20:57:05Z", "run_id": "20250925T205705Z"}
+{"event": "semantic_job_complete", "job": "order_summary", "output": "E:\\MKM\\mankind_matrix_data_engineering\\Data_cleaning\\MKM_Glue_tranformations\\transformed_outputs\\semantic\\order_summary_semantic\\run_id=20250925T205705Z", "ts": "2025-09-25T20:57:30Z", "run_id": "20250925T205705Z"}
+{"event": "semantic_job_complete", "job": "order_status_by_order", "output": "<rollup_wrote_to_semantic_run_path>", "ts": "2025-09-25T20:57:34Z", "run_id": "20250925T205705Z"}
+{"event": "semantic_job_complete", "job": "user_order_activity", "output": "<rollup_wrote_to_semantic_run_path>", "ts": "2025-09-25T20:57:38Z", "run_id": "20250925T205705Z"}
+{"event": "semantic_batch_finish", "ok": 3, "errors": 0, "ts": "2025-09-25T20:57:38Z", "run_id": "20250925T205705Z"}

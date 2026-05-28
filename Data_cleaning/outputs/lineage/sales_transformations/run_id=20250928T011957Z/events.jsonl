@@ -1,0 +1,3 @@
+{"event": "transform_batch_start", "plan": ["fact_order_items"], "ts": "2025-09-28T01:19:57Z", "run_id": "20250928T011957Z"}
+{"event": "transform_job_error", "job": "fact_order_items", "error": "Reference 'name' is ambiguous, could be: name, name.", "ts": "2025-09-28T01:20:07Z", "run_id": "20250928T011957Z"}
+{"event": "transform_batch_finish", "ok": 0, "errors": 1, "ts": "2025-09-28T01:20:07Z", "run_id": "20250928T011957Z"}

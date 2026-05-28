@@ -1,0 +1,13 @@
+generated_at: 20250916T234954Z
+required: []
+optional:
+- created_at
+- description
+- id
+- name
+- parent_id
+- updated_at
+disallowed: []
+_meta:
+  source: live_mysql
+  strategy: nullable->optional

@@ -1,5 +1,8 @@
 import os, sys, json
 from datetime import datetime, timezone
+from src.utils.lineage import get_run_id, write_run_manifest, write_event, schema_fingerprint
+RUN_ID = get_run_id()
+
 
 # --- project bootstrap (works no matter where you run it) ---
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
@@ -14,6 +17,12 @@ from src.utils.path_utils import get_validation_report_path, get_project_root
 from MKM_Data_Validation_and_cleaning.validators.pre_validations.validators_common.validation_checks import (
     check_not_null, check_unique
 )
+# --- ADD: drift ledger + run id ---
+from .._drift_recorder import record_schema_drift, record_unresolved_checks
+import os
+from datetime import datetime, timezone
+RUN_ID = os.environ.get("RUN_ID") or datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+# --- END ADD ---
 
 # Optional schema validator (DF-based as you requested earlier)
 try:
@@ -110,6 +119,76 @@ def _resolve_requested_columns(df, table_name, requested_cols, master_rules):
     return resolved, unresolved, mapping_detail
 # ----------------------------------------------------------- #
 
+# --- ADD: minimal drift detector (columns + optional types) ---
+def _diff_vs_expected_yaml(df, table_name: str):
+    """
+    Look for <repo>/MKM_Data_Validation_and_cleaning/metadata/expected_schemas/latest/<table>_schema.yaml.
+    Return (new_columns:list, removed_columns:list, type_changes:dict) — type_changes empty unless YAML carries types.
+    """
+    try:
+        root = get_project_root()
+        ypath = os.path.join(
+            root,
+            "MKM_Data_Validation_and_cleaning", "metadata", "expected_schemas",
+            "latest", f"{table_name}_schema.yaml"
+        )
+        if not os.path.exists(ypath):
+            return [], [], {}
+
+        if yaml is None:
+            return [], [], {}
+
+        with open(ypath, "r", encoding="utf-8") as f:
+            y = yaml.safe_load(f) or {}
+
+        # tolerate shapes:
+        #   {columns: {name: {type: ...}}} or {name: type} or [{name:..., type:...}]
+        expected_cols = set()
+        expected_types = {}
+
+        if isinstance(y, dict) and "columns" in y:
+            cols_obj = y["columns"]
+            if isinstance(cols_obj, dict):
+                for k, v in cols_obj.items():
+                    expected_cols.add(k)
+                    if isinstance(v, dict) and "type" in v:
+                        expected_types[k] = str(v["type"]).lower()
+            elif isinstance(cols_obj, list):
+                for item in cols_obj:
+                    if isinstance(item, dict) and item.get("name"):
+                        expected_cols.add(item["name"])
+                        if "type" in item:
+                            expected_types[item["name"]] = str(item["type"]).lower()
+        elif isinstance(y, dict):
+            for k, v in y.items():
+                expected_cols.add(k)
+                if not isinstance(v, dict):
+                    expected_types[k] = str(v).lower()
+        elif isinstance(y, list):
+            for item in y:
+                if isinstance(item, dict) and item.get("name"):
+                    expected_cols.add(item["name"])
+                    if "type" in item:
+                        expected_types[item["name"]] = str(item["type"]).lower()
+
+        actual_cols = set(df.columns)
+        new_cols = [c for c in df.columns if c not in expected_cols]
+        removed = [c for c in expected_cols if c not in actual_cols]
+
+        type_changes = {}
+        if expected_types:
+            actual_types = {name: str(t).lower() for name, t in df.dtypes}
+            for c in (actual_cols & expected_cols):
+                et = expected_types.get(c)
+                at = actual_types.get(c)
+                if et and at and et != at:
+                    type_changes[c] = f"{et}->{at}"
+
+        return new_cols, removed, type_changes
+    except Exception:
+        return [], [], {}
+# ----------------------------------------------------------- #
+
 
 def run_prevalidate_for_df(df, table_name: str, not_null_cols=None, unique_cols=None):
     """
@@ -130,6 +209,23 @@ def run_prevalidate_for_df(df, table_name: str, not_null_cols=None, unique_cols=
             validate_schema(df, table_name)
         except FileNotFoundError:
             print(f"[SCHEMA NOTICE] Expected schema YAML not found for {table_name}; skipping schema check.")
+
+    # 1.1) --- ADD: drift diff vs expected YAML, then persist to ledger if any
+    new_columns, removed_columns, type_changes = _diff_vs_expected_yaml(df, table_name)
+    if new_columns:
+        print(f"[SCHEMA NOTICE] New/unexpected columns detected: {new_columns}")
+    if removed_columns:
+        print(f"[SCHEMA NOTICE] Missing/removed columns: {removed_columns}")
+    if type_changes:
+        print(f"[SCHEMA NOTICE] Type changes: {type_changes}")
+    if new_columns or removed_columns or type_changes:
+        record_schema_drift(
+            table=table_name,
+            new_columns=new_columns or None,
+            removed_columns=removed_columns or None,
+            type_changes=type_changes or None,
+            run_id=RUN_ID,
+        )
 
     # 2) Resolve requested column names against actual DF columns
     nn_resolved, nn_unresolved, nn_map = _resolve_requested_columns(df, table_name, not_null_cols, master_rules)
@@ -168,10 +264,42 @@ def run_prevalidate_for_df(df, table_name: str, not_null_cols=None, unique_cols=
         json.dump(report, f, indent=2)
     print(f"[PRE-VALIDATION] ✅ saved: {out}")
 
+    # 4.1) --- ADD: persist unresolved column requests
     if nn_unresolved or uq_unresolved:
         print(f"[PRE-VALIDATION][{table_name}] ⚠️ Unresolved columns -> NOT NULL: {nn_unresolved} | UNIQUE: {uq_unresolved}")
+        record_unresolved_checks(
+            table=table_name,
+            not_null=nn_unresolved or None,
+            unique=uq_unresolved or None,
+            run_id=RUN_ID,
+        )
+
+    # add RUN_ID into the JSON you write
+    report["run_id"] = RUN_ID
+    with open(out, "w", encoding="utf-8") as f:
+        json.dump(report, f, indent=2)
+
+    # lineage: ensure run manifest (idempotent)
+    write_run_manifest("validation/pre", {
+        "job": "pre_validation",
+        "db_url": os.getenv("DB_URL")
+    }, run_id=RUN_ID)
+
+    # lineage: one event per table
+    write_event("validation/pre", {
+        "event": "pre_validation_complete",
+        "table": table_name,
+        "dataset_in": f"{os.getenv('DB_URL')}#{table_name}",
+        "report_path": out,
+        "row_count": report["row_count"],
+        "schema_fp": schema_fingerprint(df),
+        "unresolved_not_null": nn_unresolved,
+        "unresolved_unique": uq_unresolved
+    }, run_id=RUN_ID)
+
 
     return issues
+
 
 
 def run_prevalidate_via_jdbc(spark, table_name: str, not_null_cols=None, unique_cols=None):
