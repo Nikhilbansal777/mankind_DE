@@ -1,0 +1,4 @@
+rank,product,category,year,week_number,quantity,revenue,revenue_share_percent
+1,"GeForce RTX 4070 Family","GPUs",2025,36,2,1999.98,56.76
+2,"Jetson Orin Nano Super Developer Kit","EDGE AI COMPUTING",2025,42,1,1499.99,42.57
+3,"NVIDIA L4 GPU","AI Hardware",2025,36,1,23.50,0.67
