@@ -35,6 +35,11 @@ including revenue trends, units sold, and top performing products.
 - `tableau/executive_dashboard.twbx` — Tableau packaged workbook
 - `screenshots/dashboard_preview.png` — dashboard preview image
 
+### Power BI report
+
+- `powerbi/Mankind_Matrix_Sales_Report.pbix` — product and category sales report
+- `powerbi/README.md` — findings, DAX logic, and refresh instructions
+
 ## How to Open
 1. Download and install Tableau Public (free) from https://public.tableau.com
 2. Open `tableau/executive_dashboard.twbx`
