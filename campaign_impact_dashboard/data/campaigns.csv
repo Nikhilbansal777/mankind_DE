@@ -1,0 +1,8 @@
+campaign_id,campaign_name,channel,target_category,start_date,end_date,budget_usd,duration_days
+1,New Year Laptop Sale,Email,Laptops,2025-01-20,2025-02-02,6000,14
+2,Valentine's Wearables,Social,Wearables,2025-02-05,2025-02-14,4500,10
+3,Spring Audio Launch,Influencer,Audio,2025-03-10,2025-03-23,8000,14
+4,Smartphone Trade-In Push,Search,Smartphones,2025-04-07,2025-04-27,12000,21
+5,Gamer Week,Display,Gaming,2025-05-12,2025-05-18,3500,7
+6,Summer Accessories Bundle,Email,Accessories,2025-06-02,2025-06-15,2500,14
+7,Mid-Year Laptop Clearance,Social,Laptops,2025-06-16,2025-06-29,7000,14

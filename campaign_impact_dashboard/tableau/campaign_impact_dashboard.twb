@@ -1,0 +1,836 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<!-- build 20261.26.0410.0924                               -->
+<workbook original-version='18.1' source-build='2026.1.1 (20261.26.0410.0924)' source-platform='mac' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <AccessibleZoneTabOrder />
+    <AnimationOnByDefault />
+    <IntuitiveSorting />
+    <IntuitiveSorting_SP2 />
+    <MarkAnimation />
+    <ObjectModelEncapsulateLegacy />
+    <ObjectModelTableType />
+    <SchemaViewerObjectModel />
+    <SheetIdentifierTracking />
+    <WindowsPersistSimpleIdentifiers />
+    <ZoneBackgroundTransparency />
+  </document-format-change-manifest>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <datasources>
+    
+<datasource caption="Campaign Views" inline='true' name='federated.0campaignviews0000000000' version='18.1'>
+  <connection class='federated'>
+    <named-connections>
+      <named-connection caption="views_for_tableau" name='textscan.0campaignviews0000000000'>
+        <connection class='textscan' directory="../data" filename='views_for_tableau.csv' password='' server='' />
+      </named-connection>
+    </named-connections>
+    <relation connection='textscan.0campaignviews0000000000' name='views_for_tableau.csv' table='[views_for_tableau#csv]' type='table'><columns character-set='UTF-8' header='yes' locale='en_US' separator=','><column datatype='integer' name='view_id' ordinal='0' />
+<column datatype='datetime' name='view_ts' ordinal='1' />
+<column datatype='date' name='view_date' ordinal='2' />
+<column datatype='integer' name='user_id' ordinal='3' />
+<column datatype='integer' name='product_id' ordinal='4' />
+<column datatype='string' name='category' ordinal='5' />
+<column datatype='string' name='traffic_source' ordinal='6' />
+<column datatype='integer' name='campaign_id' ordinal='7' />
+<column datatype='integer' name='is_campaign_view' ordinal='8' />
+<column datatype='integer' name='added_to_cart' ordinal='9' />
+<column datatype='integer' name='purchased' ordinal='10' />
+<column datatype='integer' name='period_campaign_id' ordinal='11' />
+<column datatype='string' name='campaign_period' ordinal='12' />
+<column datatype='string' name='product_name' ordinal='13' />
+<column datatype='string' name='brand' ordinal='14' />
+<column datatype='real' name='price' ordinal='15' />
+<column datatype='string' name='campaign_name' ordinal='16' />
+<column datatype='string' name='channel' ordinal='17' />
+<column datatype='real' name='duration_days' ordinal='18' /></columns></relation>
+  </connection>
+  <aliases enabled='yes' />
+  <column caption='views_for_tableau.csv' datatype='table' name='[__tableau_internal_object_id__].[views_for_tableau.csv_E22C3568E6795D7A9FA01DB7B3801B7A]' role='measure' type='quantitative' />
+  <column caption="View Id" datatype='integer' name='[view_id]' role='dimension' type='ordinal' />
+<column caption="View Timestamp" datatype='datetime' name='[view_ts]' role='dimension' type='ordinal' />
+<column caption="View Date" datatype='date' name='[view_date]' role='dimension' type='ordinal' />
+<column caption="User Id" datatype='integer' name='[user_id]' role='dimension' type='ordinal' />
+<column caption="Product Id" datatype='integer' name='[product_id]' role='dimension' type='ordinal' />
+<column caption="Category" datatype='string' name='[category]' role='dimension' type='nominal' />
+<column caption="Traffic Source" datatype='string' name='[traffic_source]' role='dimension' type='nominal' />
+<column caption="Attributed Campaign Id" datatype='integer' name='[campaign_id]' role='dimension' type='ordinal' />
+<column caption="Is Campaign View" datatype='integer' name='[is_campaign_view]' role='measure' type='quantitative' />
+<column caption="Added To Cart" datatype='integer' name='[added_to_cart]' role='measure' type='quantitative' />
+<column caption="Purchased" datatype='integer' name='[purchased]' role='measure' type='quantitative' />
+<column caption="Period Campaign Id" datatype='integer' name='[period_campaign_id]' role='dimension' type='ordinal' />
+<column caption="Campaign Period" datatype='string' name='[campaign_period]' role='dimension' type='nominal' />
+<column caption="Product Name" datatype='string' name='[product_name]' role='dimension' type='nominal' />
+<column caption="Brand" datatype='string' name='[brand]' role='dimension' type='nominal' />
+<column caption="Price" datatype='real' name='[price]' role='measure' type='quantitative' />
+<column caption="Campaign Name" datatype='string' name='[campaign_name]' role='dimension' type='nominal' />
+<column caption="Channel" datatype='string' name='[channel]' role='dimension' type='nominal' />
+<column caption="Duration Days" datatype='real' name='[duration_days]' role='measure' type='quantitative' />
+<column caption="Views" datatype='integer' default-format="n#,##0" name='[Calculation_1000000000000000001]' role='measure' type='quantitative'><calculation class='tableau' formula="COUNT([view_id])" /></column>
+<column caption="Campaign View Share" datatype='real' default-format="p0.0%" name='[Calculation_1000000000000000002]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([is_campaign_view]) / COUNT([view_id])" /></column>
+<column caption="Add to Cart Rate" datatype='real' default-format="p0.00%" name='[Calculation_1000000000000000003]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([added_to_cart]) / COUNT([view_id])" /></column>
+<column caption="Purchase Rate" datatype='real' default-format="p0.00%" name='[Calculation_1000000000000000004]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([purchased]) / COUNT([view_id])" /></column>
+<column caption="Traffic Type" datatype='string' name='[Calculation_1000000000000000005]' role='dimension' type='nominal'><calculation class='tableau' formula='IF [is_campaign_view] = 1 THEN "Campaign" ELSE "Organic" END' /></column>
+<column caption="Revenue" datatype='real' default-format='c"$"#,##0' name='[Calculation_1000000000000000006]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM(IF [purchased] = 1 THEN [price] END)" /></column>
+  <layout dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+  <semantic-values><semantic-value key='[Country].[Name]' value='&quot;United States&quot;' /></semantic-values>
+  <object-graph>
+    <objects>
+      <object caption='views_for_tableau.csv' id='views_for_tableau.csv_E22C3568E6795D7A9FA01DB7B3801B7A'>
+        <properties context=''><relation connection='textscan.0campaignviews0000000000' name='views_for_tableau.csv' table='[views_for_tableau#csv]' type='table'><columns character-set='UTF-8' header='yes' locale='en_US' separator=','><column datatype='integer' name='view_id' ordinal='0' />
+<column datatype='datetime' name='view_ts' ordinal='1' />
+<column datatype='date' name='view_date' ordinal='2' />
+<column datatype='integer' name='user_id' ordinal='3' />
+<column datatype='integer' name='product_id' ordinal='4' />
+<column datatype='string' name='category' ordinal='5' />
+<column datatype='string' name='traffic_source' ordinal='6' />
+<column datatype='integer' name='campaign_id' ordinal='7' />
+<column datatype='integer' name='is_campaign_view' ordinal='8' />
+<column datatype='integer' name='added_to_cart' ordinal='9' />
+<column datatype='integer' name='purchased' ordinal='10' />
+<column datatype='integer' name='period_campaign_id' ordinal='11' />
+<column datatype='string' name='campaign_period' ordinal='12' />
+<column datatype='string' name='product_name' ordinal='13' />
+<column datatype='string' name='brand' ordinal='14' />
+<column datatype='real' name='price' ordinal='15' />
+<column datatype='string' name='campaign_name' ordinal='16' />
+<column datatype='string' name='channel' ordinal='17' />
+<column datatype='real' name='duration_days' ordinal='18' /></columns></relation></properties>
+      </object>
+    </objects>
+  </object-graph>
+</datasource>
+    
+<datasource caption="Campaign Summary" inline='true' name='federated.0campaignsummary00000000' version='18.1'>
+  <connection class='federated'>
+    <named-connections>
+      <named-connection caption="campaign_impact_summary" name='textscan.0campaignsummary00000000'>
+        <connection class='textscan' directory="../data" filename='campaign_impact_summary.csv' password='' server='' />
+      </named-connection>
+    </named-connections>
+    <relation connection='textscan.0campaignsummary00000000' name='campaign_impact_summary.csv' table='[campaign_impact_summary#csv]' type='table'><columns character-set='UTF-8' header='yes' locale='en_US' separator=','><column datatype='integer' name='campaign_id' ordinal='0' />
+<column datatype='string' name='campaign_name' ordinal='1' />
+<column datatype='string' name='channel' ordinal='2' />
+<column datatype='string' name='target_category' ordinal='3' />
+<column datatype='date' name='start_date' ordinal='4' />
+<column datatype='date' name='end_date' ordinal='5' />
+<column datatype='integer' name='duration_days' ordinal='6' />
+<column datatype='integer' name='budget_usd' ordinal='7' />
+<column datatype='real' name='baseline_avg_daily_views' ordinal='8' />
+<column datatype='real' name='campaign_avg_daily_views' ordinal='9' />
+<column datatype='real' name='view_lift_pct' ordinal='10' />
+<column datatype='integer' name='incremental_views' ordinal='11' />
+<column datatype='integer' name='attributed_views' ordinal='12' />
+<column datatype='integer' name='attributed_add_to_carts' ordinal='13' />
+<column datatype='integer' name='attributed_purchases' ordinal='14' />
+<column datatype='real' name='attributed_revenue_usd' ordinal='15' />
+<column datatype='real' name='view_to_cart_rate_pct' ordinal='16' />
+<column datatype='real' name='cost_per_incremental_view_usd' ordinal='17' />
+<column datatype='real' name='roas' ordinal='18' /></columns></relation>
+  </connection>
+  <aliases enabled='yes' />
+  <column caption='campaign_impact_summary.csv' datatype='table' name='[__tableau_internal_object_id__].[campaign_impact_summary.csv_A21BAD84E46953A9822DDAC3E507EBCD]' role='measure' type='quantitative' />
+  <column caption="Campaign Id" datatype='integer' name='[campaign_id]' role='dimension' type='ordinal' />
+<column caption="Campaign Name" datatype='string' name='[campaign_name]' role='dimension' type='nominal' />
+<column caption="Channel" datatype='string' name='[channel]' role='dimension' type='nominal' />
+<column caption="Target Category" datatype='string' name='[target_category]' role='dimension' type='nominal' />
+<column caption="Start Date" datatype='date' name='[start_date]' role='dimension' type='ordinal' />
+<column caption="End Date" datatype='date' name='[end_date]' role='dimension' type='ordinal' />
+<column caption="Duration Days" datatype='integer' name='[duration_days]' role='measure' type='quantitative' />
+<column caption="Budget (USD)" datatype='integer' name='[budget_usd]' role='measure' type='quantitative' />
+<column caption="Baseline Avg Daily Views" datatype='real' name='[baseline_avg_daily_views]' role='measure' type='quantitative' />
+<column caption="Campaign Avg Daily Views" datatype='real' name='[campaign_avg_daily_views]' role='measure' type='quantitative' />
+<column caption="View Lift Pct" datatype='real' name='[view_lift_pct]' role='measure' type='quantitative' />
+<column caption="Incremental Views" datatype='integer' name='[incremental_views]' role='measure' type='quantitative' />
+<column caption="Attributed Views" datatype='integer' name='[attributed_views]' role='measure' type='quantitative' />
+<column caption="Attributed Add To Carts" datatype='integer' name='[attributed_add_to_carts]' role='measure' type='quantitative' />
+<column caption="Attributed Purchases" datatype='integer' name='[attributed_purchases]' role='measure' type='quantitative' />
+<column caption="Attributed Revenue (USD)" datatype='real' name='[attributed_revenue_usd]' role='measure' type='quantitative' />
+<column caption="View To Cart Rate Pct" datatype='real' name='[view_to_cart_rate_pct]' role='measure' type='quantitative' />
+<column caption="Cost Per Incremental View (USD)" datatype='real' name='[cost_per_incremental_view_usd]' role='measure' type='quantitative' />
+<column caption="ROAS" datatype='real' name='[roas]' role='measure' type='quantitative' />
+<column caption="View Lift %" datatype='real' default-format="p0.0%" name='[Calculation_2000000000000000001]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([campaign_avg_daily_views]) / SUM([baseline_avg_daily_views]) - 1" /></column>
+<column caption="Avg Lift % (KPI)" datatype='real' default-format="p0.0%" name='[Calculation_2000000000000000002]' role='measure' type='quantitative'><calculation class='tableau' formula="AVG([view_lift_pct]) / 100" /></column>
+<column caption="Total Incremental Views (KPI)" datatype='integer' default-format="n#,##0" name='[Calculation_2000000000000000003]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([incremental_views])" /></column>
+<column caption="Cost per Incremental View (KPI)" datatype='real' default-format='c"$"#,##0.00' name='[Calculation_2000000000000000004]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([budget_usd]) / SUM([incremental_views])" /></column>
+<column caption="ROAS (KPI)" datatype='real' default-format='n#,##0.00"x"' name='[Calculation_2000000000000000005]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([attributed_revenue_usd]) / SUM([budget_usd])" /></column>
+  <layout dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+  <semantic-values><semantic-value key='[Country].[Name]' value='&quot;United States&quot;' /></semantic-values>
+  <object-graph>
+    <objects>
+      <object caption='campaign_impact_summary.csv' id='campaign_impact_summary.csv_A21BAD84E46953A9822DDAC3E507EBCD'>
+        <properties context=''><relation connection='textscan.0campaignsummary00000000' name='campaign_impact_summary.csv' table='[campaign_impact_summary#csv]' type='table'><columns character-set='UTF-8' header='yes' locale='en_US' separator=','><column datatype='integer' name='campaign_id' ordinal='0' />
+<column datatype='string' name='campaign_name' ordinal='1' />
+<column datatype='string' name='channel' ordinal='2' />
+<column datatype='string' name='target_category' ordinal='3' />
+<column datatype='date' name='start_date' ordinal='4' />
+<column datatype='date' name='end_date' ordinal='5' />
+<column datatype='integer' name='duration_days' ordinal='6' />
+<column datatype='integer' name='budget_usd' ordinal='7' />
+<column datatype='real' name='baseline_avg_daily_views' ordinal='8' />
+<column datatype='real' name='campaign_avg_daily_views' ordinal='9' />
+<column datatype='real' name='view_lift_pct' ordinal='10' />
+<column datatype='integer' name='incremental_views' ordinal='11' />
+<column datatype='integer' name='attributed_views' ordinal='12' />
+<column datatype='integer' name='attributed_add_to_carts' ordinal='13' />
+<column datatype='integer' name='attributed_purchases' ordinal='14' />
+<column datatype='real' name='attributed_revenue_usd' ordinal='15' />
+<column datatype='real' name='view_to_cart_rate_pct' ordinal='16' />
+<column datatype='real' name='cost_per_incremental_view_usd' ordinal='17' />
+<column datatype='real' name='roas' ordinal='18' /></columns></relation></properties>
+      </object>
+    </objects>
+  </object-graph>
+</datasource>
+  </datasources>
+  <worksheets>
+    
+<worksheet name="KPI Total Views">
+  <layout-options><title><formatted-text><run bold='true' fontsize='11'>Total Product Views</run></formatted-text></title></layout-options>
+  <table>
+    <view>
+      <datasources><datasource caption='Campaign Views' name='federated.0campaignviews0000000000' /></datasources>
+      <datasource-dependencies datasource='federated.0campaignviews0000000000'>
+        <column caption="View Id" datatype='integer' name='[view_id]' role='dimension' type='ordinal' />
+<column caption="View Timestamp" datatype='datetime' name='[view_ts]' role='dimension' type='ordinal' />
+<column caption="View Date" datatype='date' name='[view_date]' role='dimension' type='ordinal' />
+<column caption="User Id" datatype='integer' name='[user_id]' role='dimension' type='ordinal' />
+<column caption="Product Id" datatype='integer' name='[product_id]' role='dimension' type='ordinal' />
+<column caption="Category" datatype='string' name='[category]' role='dimension' type='nominal' />
+<column caption="Traffic Source" datatype='string' name='[traffic_source]' role='dimension' type='nominal' />
+<column caption="Attributed Campaign Id" datatype='integer' name='[campaign_id]' role='dimension' type='ordinal' />
+<column caption="Is Campaign View" datatype='integer' name='[is_campaign_view]' role='measure' type='quantitative' />
+<column caption="Added To Cart" datatype='integer' name='[added_to_cart]' role='measure' type='quantitative' />
+<column caption="Purchased" datatype='integer' name='[purchased]' role='measure' type='quantitative' />
+<column caption="Period Campaign Id" datatype='integer' name='[period_campaign_id]' role='dimension' type='ordinal' />
+<column caption="Campaign Period" datatype='string' name='[campaign_period]' role='dimension' type='nominal' />
+<column caption="Product Name" datatype='string' name='[product_name]' role='dimension' type='nominal' />
+<column caption="Brand" datatype='string' name='[brand]' role='dimension' type='nominal' />
+<column caption="Price" datatype='real' name='[price]' role='measure' type='quantitative' />
+<column caption="Campaign Name" datatype='string' name='[campaign_name]' role='dimension' type='nominal' />
+<column caption="Channel" datatype='string' name='[channel]' role='dimension' type='nominal' />
+<column caption="Duration Days" datatype='real' name='[duration_days]' role='measure' type='quantitative' />
+<column caption="Views" datatype='integer' default-format="n#,##0" name='[Calculation_1000000000000000001]' role='measure' type='quantitative'><calculation class='tableau' formula="COUNT([view_id])" /></column>
+<column caption="Campaign View Share" datatype='real' default-format="p0.0%" name='[Calculation_1000000000000000002]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([is_campaign_view]) / COUNT([view_id])" /></column>
+<column caption="Add to Cart Rate" datatype='real' default-format="p0.00%" name='[Calculation_1000000000000000003]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([added_to_cart]) / COUNT([view_id])" /></column>
+<column caption="Purchase Rate" datatype='real' default-format="p0.00%" name='[Calculation_1000000000000000004]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([purchased]) / COUNT([view_id])" /></column>
+<column caption="Traffic Type" datatype='string' name='[Calculation_1000000000000000005]' role='dimension' type='nominal'><calculation class='tableau' formula='IF [is_campaign_view] = 1 THEN "Campaign" ELSE "Organic" END' /></column>
+<column caption="Revenue" datatype='real' default-format='c"$"#,##0' name='[Calculation_1000000000000000006]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM(IF [purchased] = 1 THEN [price] END)" /></column>
+        <column-instance column='[Calculation_1000000000000000001]' derivation='User' name='[usr:Calculation_1000000000000000001:qk]' pivot='key' type='quantitative' />
+      </datasource-dependencies>
+      
+      
+      
+      <aggregation value='true' />
+    </view>
+    <style />
+    <panes>
+      <pane selection-relaxation-option='selection-relaxation-allow'>
+        <view><breakdown value='auto' /></view>
+        <mark class='Text' />
+        <encodings><text column='[federated.0campaignviews0000000000].[usr:Calculation_1000000000000000001:qk]' /></encodings>
+      </pane>
+    </panes>
+    <rows></rows>
+    <cols></cols>
+  </table>
+  <simple-id uuid='{B55CA05A-21BC-4384-BC34-5B606BCF8FD7}' />
+</worksheet>
+<worksheet name="KPI Campaign Share">
+  <layout-options><title><formatted-text><run bold='true' fontsize='11'>Views from Campaigns</run></formatted-text></title></layout-options>
+  <table>
+    <view>
+      <datasources><datasource caption='Campaign Views' name='federated.0campaignviews0000000000' /></datasources>
+      <datasource-dependencies datasource='federated.0campaignviews0000000000'>
+        <column caption="View Id" datatype='integer' name='[view_id]' role='dimension' type='ordinal' />
+<column caption="View Timestamp" datatype='datetime' name='[view_ts]' role='dimension' type='ordinal' />
+<column caption="View Date" datatype='date' name='[view_date]' role='dimension' type='ordinal' />
+<column caption="User Id" datatype='integer' name='[user_id]' role='dimension' type='ordinal' />
+<column caption="Product Id" datatype='integer' name='[product_id]' role='dimension' type='ordinal' />
+<column caption="Category" datatype='string' name='[category]' role='dimension' type='nominal' />
+<column caption="Traffic Source" datatype='string' name='[traffic_source]' role='dimension' type='nominal' />
+<column caption="Attributed Campaign Id" datatype='integer' name='[campaign_id]' role='dimension' type='ordinal' />
+<column caption="Is Campaign View" datatype='integer' name='[is_campaign_view]' role='measure' type='quantitative' />
+<column caption="Added To Cart" datatype='integer' name='[added_to_cart]' role='measure' type='quantitative' />
+<column caption="Purchased" datatype='integer' name='[purchased]' role='measure' type='quantitative' />
+<column caption="Period Campaign Id" datatype='integer' name='[period_campaign_id]' role='dimension' type='ordinal' />
+<column caption="Campaign Period" datatype='string' name='[campaign_period]' role='dimension' type='nominal' />
+<column caption="Product Name" datatype='string' name='[product_name]' role='dimension' type='nominal' />
+<column caption="Brand" datatype='string' name='[brand]' role='dimension' type='nominal' />
+<column caption="Price" datatype='real' name='[price]' role='measure' type='quantitative' />
+<column caption="Campaign Name" datatype='string' name='[campaign_name]' role='dimension' type='nominal' />
+<column caption="Channel" datatype='string' name='[channel]' role='dimension' type='nominal' />
+<column caption="Duration Days" datatype='real' name='[duration_days]' role='measure' type='quantitative' />
+<column caption="Views" datatype='integer' default-format="n#,##0" name='[Calculation_1000000000000000001]' role='measure' type='quantitative'><calculation class='tableau' formula="COUNT([view_id])" /></column>
+<column caption="Campaign View Share" datatype='real' default-format="p0.0%" name='[Calculation_1000000000000000002]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([is_campaign_view]) / COUNT([view_id])" /></column>
+<column caption="Add to Cart Rate" datatype='real' default-format="p0.00%" name='[Calculation_1000000000000000003]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([added_to_cart]) / COUNT([view_id])" /></column>
+<column caption="Purchase Rate" datatype='real' default-format="p0.00%" name='[Calculation_1000000000000000004]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([purchased]) / COUNT([view_id])" /></column>
+<column caption="Traffic Type" datatype='string' name='[Calculation_1000000000000000005]' role='dimension' type='nominal'><calculation class='tableau' formula='IF [is_campaign_view] = 1 THEN "Campaign" ELSE "Organic" END' /></column>
+<column caption="Revenue" datatype='real' default-format='c"$"#,##0' name='[Calculation_1000000000000000006]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM(IF [purchased] = 1 THEN [price] END)" /></column>
+        <column-instance column='[Calculation_1000000000000000002]' derivation='User' name='[usr:Calculation_1000000000000000002:qk]' pivot='key' type='quantitative' />
+      </datasource-dependencies>
+      
+      
+      
+      <aggregation value='true' />
+    </view>
+    <style />
+    <panes>
+      <pane selection-relaxation-option='selection-relaxation-allow'>
+        <view><breakdown value='auto' /></view>
+        <mark class='Text' />
+        <encodings><text column='[federated.0campaignviews0000000000].[usr:Calculation_1000000000000000002:qk]' /></encodings>
+      </pane>
+    </panes>
+    <rows></rows>
+    <cols></cols>
+  </table>
+  <simple-id uuid='{F710DB3C-1BE3-4088-976B-F40E78B11315}' />
+</worksheet>
+<worksheet name="KPI Avg Lift">
+  <layout-options><title><formatted-text><run bold='true' fontsize='11'>Avg View Lift</run></formatted-text></title></layout-options>
+  <table>
+    <view>
+      <datasources><datasource caption='Campaign Summary' name='federated.0campaignsummary00000000' /></datasources>
+      <datasource-dependencies datasource='federated.0campaignsummary00000000'>
+        <column caption="Campaign Id" datatype='integer' name='[campaign_id]' role='dimension' type='ordinal' />
+<column caption="Campaign Name" datatype='string' name='[campaign_name]' role='dimension' type='nominal' />
+<column caption="Channel" datatype='string' name='[channel]' role='dimension' type='nominal' />
+<column caption="Target Category" datatype='string' name='[target_category]' role='dimension' type='nominal' />
+<column caption="Start Date" datatype='date' name='[start_date]' role='dimension' type='ordinal' />
+<column caption="End Date" datatype='date' name='[end_date]' role='dimension' type='ordinal' />
+<column caption="Duration Days" datatype='integer' name='[duration_days]' role='measure' type='quantitative' />
+<column caption="Budget (USD)" datatype='integer' name='[budget_usd]' role='measure' type='quantitative' />
+<column caption="Baseline Avg Daily Views" datatype='real' name='[baseline_avg_daily_views]' role='measure' type='quantitative' />
+<column caption="Campaign Avg Daily Views" datatype='real' name='[campaign_avg_daily_views]' role='measure' type='quantitative' />
+<column caption="View Lift Pct" datatype='real' name='[view_lift_pct]' role='measure' type='quantitative' />
+<column caption="Incremental Views" datatype='integer' name='[incremental_views]' role='measure' type='quantitative' />
+<column caption="Attributed Views" datatype='integer' name='[attributed_views]' role='measure' type='quantitative' />
+<column caption="Attributed Add To Carts" datatype='integer' name='[attributed_add_to_carts]' role='measure' type='quantitative' />
+<column caption="Attributed Purchases" datatype='integer' name='[attributed_purchases]' role='measure' type='quantitative' />
+<column caption="Attributed Revenue (USD)" datatype='real' name='[attributed_revenue_usd]' role='measure' type='quantitative' />
+<column caption="View To Cart Rate Pct" datatype='real' name='[view_to_cart_rate_pct]' role='measure' type='quantitative' />
+<column caption="Cost Per Incremental View (USD)" datatype='real' name='[cost_per_incremental_view_usd]' role='measure' type='quantitative' />
+<column caption="ROAS" datatype='real' name='[roas]' role='measure' type='quantitative' />
+<column caption="View Lift %" datatype='real' default-format="p0.0%" name='[Calculation_2000000000000000001]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([campaign_avg_daily_views]) / SUM([baseline_avg_daily_views]) - 1" /></column>
+<column caption="Avg Lift % (KPI)" datatype='real' default-format="p0.0%" name='[Calculation_2000000000000000002]' role='measure' type='quantitative'><calculation class='tableau' formula="AVG([view_lift_pct]) / 100" /></column>
+<column caption="Total Incremental Views (KPI)" datatype='integer' default-format="n#,##0" name='[Calculation_2000000000000000003]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([incremental_views])" /></column>
+<column caption="Cost per Incremental View (KPI)" datatype='real' default-format='c"$"#,##0.00' name='[Calculation_2000000000000000004]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([budget_usd]) / SUM([incremental_views])" /></column>
+<column caption="ROAS (KPI)" datatype='real' default-format='n#,##0.00"x"' name='[Calculation_2000000000000000005]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([attributed_revenue_usd]) / SUM([budget_usd])" /></column>
+        <column-instance column='[Calculation_2000000000000000002]' derivation='User' name='[usr:Calculation_2000000000000000002:qk]' pivot='key' type='quantitative' />
+      </datasource-dependencies>
+      
+      
+      
+      <aggregation value='true' />
+    </view>
+    <style />
+    <panes>
+      <pane selection-relaxation-option='selection-relaxation-allow'>
+        <view><breakdown value='auto' /></view>
+        <mark class='Text' />
+        <encodings><text column='[federated.0campaignsummary00000000].[usr:Calculation_2000000000000000002:qk]' /></encodings>
+      </pane>
+    </panes>
+    <rows></rows>
+    <cols></cols>
+  </table>
+  <simple-id uuid='{A09452EC-3189-435B-9F2A-B28F8725DE84}' />
+</worksheet>
+<worksheet name="KPI Incremental Views">
+  <layout-options><title><formatted-text><run bold='true' fontsize='11'>Incremental Views</run></formatted-text></title></layout-options>
+  <table>
+    <view>
+      <datasources><datasource caption='Campaign Summary' name='federated.0campaignsummary00000000' /></datasources>
+      <datasource-dependencies datasource='federated.0campaignsummary00000000'>
+        <column caption="Campaign Id" datatype='integer' name='[campaign_id]' role='dimension' type='ordinal' />
+<column caption="Campaign Name" datatype='string' name='[campaign_name]' role='dimension' type='nominal' />
+<column caption="Channel" datatype='string' name='[channel]' role='dimension' type='nominal' />
+<column caption="Target Category" datatype='string' name='[target_category]' role='dimension' type='nominal' />
+<column caption="Start Date" datatype='date' name='[start_date]' role='dimension' type='ordinal' />
+<column caption="End Date" datatype='date' name='[end_date]' role='dimension' type='ordinal' />
+<column caption="Duration Days" datatype='integer' name='[duration_days]' role='measure' type='quantitative' />
+<column caption="Budget (USD)" datatype='integer' name='[budget_usd]' role='measure' type='quantitative' />
+<column caption="Baseline Avg Daily Views" datatype='real' name='[baseline_avg_daily_views]' role='measure' type='quantitative' />
+<column caption="Campaign Avg Daily Views" datatype='real' name='[campaign_avg_daily_views]' role='measure' type='quantitative' />
+<column caption="View Lift Pct" datatype='real' name='[view_lift_pct]' role='measure' type='quantitative' />
+<column caption="Incremental Views" datatype='integer' name='[incremental_views]' role='measure' type='quantitative' />
+<column caption="Attributed Views" datatype='integer' name='[attributed_views]' role='measure' type='quantitative' />
+<column caption="Attributed Add To Carts" datatype='integer' name='[attributed_add_to_carts]' role='measure' type='quantitative' />
+<column caption="Attributed Purchases" datatype='integer' name='[attributed_purchases]' role='measure' type='quantitative' />
+<column caption="Attributed Revenue (USD)" datatype='real' name='[attributed_revenue_usd]' role='measure' type='quantitative' />
+<column caption="View To Cart Rate Pct" datatype='real' name='[view_to_cart_rate_pct]' role='measure' type='quantitative' />
+<column caption="Cost Per Incremental View (USD)" datatype='real' name='[cost_per_incremental_view_usd]' role='measure' type='quantitative' />
+<column caption="ROAS" datatype='real' name='[roas]' role='measure' type='quantitative' />
+<column caption="View Lift %" datatype='real' default-format="p0.0%" name='[Calculation_2000000000000000001]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([campaign_avg_daily_views]) / SUM([baseline_avg_daily_views]) - 1" /></column>
+<column caption="Avg Lift % (KPI)" datatype='real' default-format="p0.0%" name='[Calculation_2000000000000000002]' role='measure' type='quantitative'><calculation class='tableau' formula="AVG([view_lift_pct]) / 100" /></column>
+<column caption="Total Incremental Views (KPI)" datatype='integer' default-format="n#,##0" name='[Calculation_2000000000000000003]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([incremental_views])" /></column>
+<column caption="Cost per Incremental View (KPI)" datatype='real' default-format='c"$"#,##0.00' name='[Calculation_2000000000000000004]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([budget_usd]) / SUM([incremental_views])" /></column>
+<column caption="ROAS (KPI)" datatype='real' default-format='n#,##0.00"x"' name='[Calculation_2000000000000000005]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([attributed_revenue_usd]) / SUM([budget_usd])" /></column>
+        <column-instance column='[Calculation_2000000000000000003]' derivation='User' name='[usr:Calculation_2000000000000000003:qk]' pivot='key' type='quantitative' />
+      </datasource-dependencies>
+      
+      
+      
+      <aggregation value='true' />
+    </view>
+    <style />
+    <panes>
+      <pane selection-relaxation-option='selection-relaxation-allow'>
+        <view><breakdown value='auto' /></view>
+        <mark class='Text' />
+        <encodings><text column='[federated.0campaignsummary00000000].[usr:Calculation_2000000000000000003:qk]' /></encodings>
+      </pane>
+    </panes>
+    <rows></rows>
+    <cols></cols>
+  </table>
+  <simple-id uuid='{EA3C19DA-D1AC-4379-8909-E618C32C9388}' />
+</worksheet>
+<worksheet name="KPI Cost per Incremental View">
+  <layout-options><title><formatted-text><run bold='true' fontsize='11'>Cost / Incremental View</run></formatted-text></title></layout-options>
+  <table>
+    <view>
+      <datasources><datasource caption='Campaign Summary' name='federated.0campaignsummary00000000' /></datasources>
+      <datasource-dependencies datasource='federated.0campaignsummary00000000'>
+        <column caption="Campaign Id" datatype='integer' name='[campaign_id]' role='dimension' type='ordinal' />
+<column caption="Campaign Name" datatype='string' name='[campaign_name]' role='dimension' type='nominal' />
+<column caption="Channel" datatype='string' name='[channel]' role='dimension' type='nominal' />
+<column caption="Target Category" datatype='string' name='[target_category]' role='dimension' type='nominal' />
+<column caption="Start Date" datatype='date' name='[start_date]' role='dimension' type='ordinal' />
+<column caption="End Date" datatype='date' name='[end_date]' role='dimension' type='ordinal' />
+<column caption="Duration Days" datatype='integer' name='[duration_days]' role='measure' type='quantitative' />
+<column caption="Budget (USD)" datatype='integer' name='[budget_usd]' role='measure' type='quantitative' />
+<column caption="Baseline Avg Daily Views" datatype='real' name='[baseline_avg_daily_views]' role='measure' type='quantitative' />
+<column caption="Campaign Avg Daily Views" datatype='real' name='[campaign_avg_daily_views]' role='measure' type='quantitative' />
+<column caption="View Lift Pct" datatype='real' name='[view_lift_pct]' role='measure' type='quantitative' />
+<column caption="Incremental Views" datatype='integer' name='[incremental_views]' role='measure' type='quantitative' />
+<column caption="Attributed Views" datatype='integer' name='[attributed_views]' role='measure' type='quantitative' />
+<column caption="Attributed Add To Carts" datatype='integer' name='[attributed_add_to_carts]' role='measure' type='quantitative' />
+<column caption="Attributed Purchases" datatype='integer' name='[attributed_purchases]' role='measure' type='quantitative' />
+<column caption="Attributed Revenue (USD)" datatype='real' name='[attributed_revenue_usd]' role='measure' type='quantitative' />
+<column caption="View To Cart Rate Pct" datatype='real' name='[view_to_cart_rate_pct]' role='measure' type='quantitative' />
+<column caption="Cost Per Incremental View (USD)" datatype='real' name='[cost_per_incremental_view_usd]' role='measure' type='quantitative' />
+<column caption="ROAS" datatype='real' name='[roas]' role='measure' type='quantitative' />
+<column caption="View Lift %" datatype='real' default-format="p0.0%" name='[Calculation_2000000000000000001]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([campaign_avg_daily_views]) / SUM([baseline_avg_daily_views]) - 1" /></column>
+<column caption="Avg Lift % (KPI)" datatype='real' default-format="p0.0%" name='[Calculation_2000000000000000002]' role='measure' type='quantitative'><calculation class='tableau' formula="AVG([view_lift_pct]) / 100" /></column>
+<column caption="Total Incremental Views (KPI)" datatype='integer' default-format="n#,##0" name='[Calculation_2000000000000000003]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([incremental_views])" /></column>
+<column caption="Cost per Incremental View (KPI)" datatype='real' default-format='c"$"#,##0.00' name='[Calculation_2000000000000000004]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([budget_usd]) / SUM([incremental_views])" /></column>
+<column caption="ROAS (KPI)" datatype='real' default-format='n#,##0.00"x"' name='[Calculation_2000000000000000005]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([attributed_revenue_usd]) / SUM([budget_usd])" /></column>
+        <column-instance column='[Calculation_2000000000000000004]' derivation='User' name='[usr:Calculation_2000000000000000004:qk]' pivot='key' type='quantitative' />
+      </datasource-dependencies>
+      
+      
+      
+      <aggregation value='true' />
+    </view>
+    <style />
+    <panes>
+      <pane selection-relaxation-option='selection-relaxation-allow'>
+        <view><breakdown value='auto' /></view>
+        <mark class='Text' />
+        <encodings><text column='[federated.0campaignsummary00000000].[usr:Calculation_2000000000000000004:qk]' /></encodings>
+      </pane>
+    </panes>
+    <rows></rows>
+    <cols></cols>
+  </table>
+  <simple-id uuid='{C5FEE26F-C92A-4DB7-A392-40DE989BDE87}' />
+</worksheet>
+<worksheet name="KPI ROAS">
+  <layout-options><title><formatted-text><run bold='true' fontsize='11'>ROAS</run></formatted-text></title></layout-options>
+  <table>
+    <view>
+      <datasources><datasource caption='Campaign Summary' name='federated.0campaignsummary00000000' /></datasources>
+      <datasource-dependencies datasource='federated.0campaignsummary00000000'>
+        <column caption="Campaign Id" datatype='integer' name='[campaign_id]' role='dimension' type='ordinal' />
+<column caption="Campaign Name" datatype='string' name='[campaign_name]' role='dimension' type='nominal' />
+<column caption="Channel" datatype='string' name='[channel]' role='dimension' type='nominal' />
+<column caption="Target Category" datatype='string' name='[target_category]' role='dimension' type='nominal' />
+<column caption="Start Date" datatype='date' name='[start_date]' role='dimension' type='ordinal' />
+<column caption="End Date" datatype='date' name='[end_date]' role='dimension' type='ordinal' />
+<column caption="Duration Days" datatype='integer' name='[duration_days]' role='measure' type='quantitative' />
+<column caption="Budget (USD)" datatype='integer' name='[budget_usd]' role='measure' type='quantitative' />
+<column caption="Baseline Avg Daily Views" datatype='real' name='[baseline_avg_daily_views]' role='measure' type='quantitative' />
+<column caption="Campaign Avg Daily Views" datatype='real' name='[campaign_avg_daily_views]' role='measure' type='quantitative' />
+<column caption="View Lift Pct" datatype='real' name='[view_lift_pct]' role='measure' type='quantitative' />
+<column caption="Incremental Views" datatype='integer' name='[incremental_views]' role='measure' type='quantitative' />
+<column caption="Attributed Views" datatype='integer' name='[attributed_views]' role='measure' type='quantitative' />
+<column caption="Attributed Add To Carts" datatype='integer' name='[attributed_add_to_carts]' role='measure' type='quantitative' />
+<column caption="Attributed Purchases" datatype='integer' name='[attributed_purchases]' role='measure' type='quantitative' />
+<column caption="Attributed Revenue (USD)" datatype='real' name='[attributed_revenue_usd]' role='measure' type='quantitative' />
+<column caption="View To Cart Rate Pct" datatype='real' name='[view_to_cart_rate_pct]' role='measure' type='quantitative' />
+<column caption="Cost Per Incremental View (USD)" datatype='real' name='[cost_per_incremental_view_usd]' role='measure' type='quantitative' />
+<column caption="ROAS" datatype='real' name='[roas]' role='measure' type='quantitative' />
+<column caption="View Lift %" datatype='real' default-format="p0.0%" name='[Calculation_2000000000000000001]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([campaign_avg_daily_views]) / SUM([baseline_avg_daily_views]) - 1" /></column>
+<column caption="Avg Lift % (KPI)" datatype='real' default-format="p0.0%" name='[Calculation_2000000000000000002]' role='measure' type='quantitative'><calculation class='tableau' formula="AVG([view_lift_pct]) / 100" /></column>
+<column caption="Total Incremental Views (KPI)" datatype='integer' default-format="n#,##0" name='[Calculation_2000000000000000003]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([incremental_views])" /></column>
+<column caption="Cost per Incremental View (KPI)" datatype='real' default-format='c"$"#,##0.00' name='[Calculation_2000000000000000004]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([budget_usd]) / SUM([incremental_views])" /></column>
+<column caption="ROAS (KPI)" datatype='real' default-format='n#,##0.00"x"' name='[Calculation_2000000000000000005]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([attributed_revenue_usd]) / SUM([budget_usd])" /></column>
+        <column-instance column='[Calculation_2000000000000000005]' derivation='User' name='[usr:Calculation_2000000000000000005:qk]' pivot='key' type='quantitative' />
+      </datasource-dependencies>
+      
+      
+      
+      <aggregation value='true' />
+    </view>
+    <style />
+    <panes>
+      <pane selection-relaxation-option='selection-relaxation-allow'>
+        <view><breakdown value='auto' /></view>
+        <mark class='Text' />
+        <encodings><text column='[federated.0campaignsummary00000000].[usr:Calculation_2000000000000000005:qk]' /></encodings>
+      </pane>
+    </panes>
+    <rows></rows>
+    <cols></cols>
+  </table>
+  <simple-id uuid='{FF7F4AF8-6E62-459C-9AC7-307812846816}' />
+</worksheet>
+<worksheet name="Daily Views Trend">
+  <layout-options><title><formatted-text><run bold='true' fontsize='11'>Daily Product Views — Campaign vs Organic Traffic</run></formatted-text></title></layout-options>
+  <table>
+    <view>
+      <datasources><datasource caption='Campaign Views' name='federated.0campaignviews0000000000' /></datasources>
+      <datasource-dependencies datasource='federated.0campaignviews0000000000'>
+        <column caption="View Id" datatype='integer' name='[view_id]' role='dimension' type='ordinal' />
+<column caption="View Timestamp" datatype='datetime' name='[view_ts]' role='dimension' type='ordinal' />
+<column caption="View Date" datatype='date' name='[view_date]' role='dimension' type='ordinal' />
+<column caption="User Id" datatype='integer' name='[user_id]' role='dimension' type='ordinal' />
+<column caption="Product Id" datatype='integer' name='[product_id]' role='dimension' type='ordinal' />
+<column caption="Category" datatype='string' name='[category]' role='dimension' type='nominal' />
+<column caption="Traffic Source" datatype='string' name='[traffic_source]' role='dimension' type='nominal' />
+<column caption="Attributed Campaign Id" datatype='integer' name='[campaign_id]' role='dimension' type='ordinal' />
+<column caption="Is Campaign View" datatype='integer' name='[is_campaign_view]' role='measure' type='quantitative' />
+<column caption="Added To Cart" datatype='integer' name='[added_to_cart]' role='measure' type='quantitative' />
+<column caption="Purchased" datatype='integer' name='[purchased]' role='measure' type='quantitative' />
+<column caption="Period Campaign Id" datatype='integer' name='[period_campaign_id]' role='dimension' type='ordinal' />
+<column caption="Campaign Period" datatype='string' name='[campaign_period]' role='dimension' type='nominal' />
+<column caption="Product Name" datatype='string' name='[product_name]' role='dimension' type='nominal' />
+<column caption="Brand" datatype='string' name='[brand]' role='dimension' type='nominal' />
+<column caption="Price" datatype='real' name='[price]' role='measure' type='quantitative' />
+<column caption="Campaign Name" datatype='string' name='[campaign_name]' role='dimension' type='nominal' />
+<column caption="Channel" datatype='string' name='[channel]' role='dimension' type='nominal' />
+<column caption="Duration Days" datatype='real' name='[duration_days]' role='measure' type='quantitative' />
+<column caption="Views" datatype='integer' default-format="n#,##0" name='[Calculation_1000000000000000001]' role='measure' type='quantitative'><calculation class='tableau' formula="COUNT([view_id])" /></column>
+<column caption="Campaign View Share" datatype='real' default-format="p0.0%" name='[Calculation_1000000000000000002]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([is_campaign_view]) / COUNT([view_id])" /></column>
+<column caption="Add to Cart Rate" datatype='real' default-format="p0.00%" name='[Calculation_1000000000000000003]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([added_to_cart]) / COUNT([view_id])" /></column>
+<column caption="Purchase Rate" datatype='real' default-format="p0.00%" name='[Calculation_1000000000000000004]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([purchased]) / COUNT([view_id])" /></column>
+<column caption="Traffic Type" datatype='string' name='[Calculation_1000000000000000005]' role='dimension' type='nominal'><calculation class='tableau' formula='IF [is_campaign_view] = 1 THEN "Campaign" ELSE "Organic" END' /></column>
+<column caption="Revenue" datatype='real' default-format='c"$"#,##0' name='[Calculation_1000000000000000006]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM(IF [purchased] = 1 THEN [price] END)" /></column>
+        <column-instance column='[Calculation_1000000000000000001]' derivation='User' name='[usr:Calculation_1000000000000000001:qk]' pivot='key' type='quantitative' />
+<column-instance column='[view_date]' derivation='Day-Trunc' name='[tdy:view_date:qk]' pivot='key' type='quantitative' />
+<column-instance column='[Calculation_1000000000000000005]' derivation='None' name='[none:Calculation_1000000000000000005:nk]' pivot='key' type='nominal' />
+<column-instance column='[category]' derivation='None' name='[none:category:nk]' pivot='key' type='nominal' />
+      </datasource-dependencies>
+      <filter class='categorical' column='[federated.0campaignviews0000000000].[none:category:nk]'><groupfilter function='level-members' level='[none:category:nk]' user:ui-enumeration='all' user:ui-marker='enumerate' /></filter>
+      
+      <slices><column>[federated.0campaignviews0000000000].[none:category:nk]</column></slices>
+      <aggregation value='true' />
+    </view>
+    <style />
+    <panes>
+      <pane selection-relaxation-option='selection-relaxation-allow'>
+        <view><breakdown value='auto' /></view>
+        <mark class='Area' />
+        <encodings><color column='[federated.0campaignviews0000000000].[none:Calculation_1000000000000000005:nk]' /></encodings>
+      </pane>
+    </panes>
+    <rows>[federated.0campaignviews0000000000].[usr:Calculation_1000000000000000001:qk]</rows>
+    <cols>[federated.0campaignviews0000000000].[tdy:view_date:qk]</cols>
+  </table>
+  <simple-id uuid='{D0C9799B-2EEE-4D81-856C-FE6036FCE161}' />
+</worksheet>
+<worksheet name="Baseline vs Campaign">
+  <layout-options><title><formatted-text><run bold='true' fontsize='11'>Avg Daily Views: 14-Day Baseline vs During Campaign</run></formatted-text></title></layout-options>
+  <table>
+    <view>
+      <datasources><datasource caption='Campaign Summary' name='federated.0campaignsummary00000000' /></datasources>
+      <datasource-dependencies datasource='federated.0campaignsummary00000000'>
+        <column caption="Campaign Id" datatype='integer' name='[campaign_id]' role='dimension' type='ordinal' />
+<column caption="Campaign Name" datatype='string' name='[campaign_name]' role='dimension' type='nominal' />
+<column caption="Channel" datatype='string' name='[channel]' role='dimension' type='nominal' />
+<column caption="Target Category" datatype='string' name='[target_category]' role='dimension' type='nominal' />
+<column caption="Start Date" datatype='date' name='[start_date]' role='dimension' type='ordinal' />
+<column caption="End Date" datatype='date' name='[end_date]' role='dimension' type='ordinal' />
+<column caption="Duration Days" datatype='integer' name='[duration_days]' role='measure' type='quantitative' />
+<column caption="Budget (USD)" datatype='integer' name='[budget_usd]' role='measure' type='quantitative' />
+<column caption="Baseline Avg Daily Views" datatype='real' name='[baseline_avg_daily_views]' role='measure' type='quantitative' />
+<column caption="Campaign Avg Daily Views" datatype='real' name='[campaign_avg_daily_views]' role='measure' type='quantitative' />
+<column caption="View Lift Pct" datatype='real' name='[view_lift_pct]' role='measure' type='quantitative' />
+<column caption="Incremental Views" datatype='integer' name='[incremental_views]' role='measure' type='quantitative' />
+<column caption="Attributed Views" datatype='integer' name='[attributed_views]' role='measure' type='quantitative' />
+<column caption="Attributed Add To Carts" datatype='integer' name='[attributed_add_to_carts]' role='measure' type='quantitative' />
+<column caption="Attributed Purchases" datatype='integer' name='[attributed_purchases]' role='measure' type='quantitative' />
+<column caption="Attributed Revenue (USD)" datatype='real' name='[attributed_revenue_usd]' role='measure' type='quantitative' />
+<column caption="View To Cart Rate Pct" datatype='real' name='[view_to_cart_rate_pct]' role='measure' type='quantitative' />
+<column caption="Cost Per Incremental View (USD)" datatype='real' name='[cost_per_incremental_view_usd]' role='measure' type='quantitative' />
+<column caption="ROAS" datatype='real' name='[roas]' role='measure' type='quantitative' />
+<column caption="View Lift %" datatype='real' default-format="p0.0%" name='[Calculation_2000000000000000001]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([campaign_avg_daily_views]) / SUM([baseline_avg_daily_views]) - 1" /></column>
+<column caption="Avg Lift % (KPI)" datatype='real' default-format="p0.0%" name='[Calculation_2000000000000000002]' role='measure' type='quantitative'><calculation class='tableau' formula="AVG([view_lift_pct]) / 100" /></column>
+<column caption="Total Incremental Views (KPI)" datatype='integer' default-format="n#,##0" name='[Calculation_2000000000000000003]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([incremental_views])" /></column>
+<column caption="Cost per Incremental View (KPI)" datatype='real' default-format='c"$"#,##0.00' name='[Calculation_2000000000000000004]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([budget_usd]) / SUM([incremental_views])" /></column>
+<column caption="ROAS (KPI)" datatype='real' default-format='n#,##0.00"x"' name='[Calculation_2000000000000000005]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([attributed_revenue_usd]) / SUM([budget_usd])" /></column>
+        <column-instance column='[campaign_name]' derivation='None' name='[none:campaign_name:nk]' pivot='key' type='nominal' />
+<column-instance column='[baseline_avg_daily_views]' derivation='Sum' name='[sum:baseline_avg_daily_views:qk]' pivot='key' type='quantitative' />
+<column-instance column='[campaign_avg_daily_views]' derivation='Sum' name='[sum:campaign_avg_daily_views:qk]' pivot='key' type='quantitative' />
+<column-instance column='[Calculation_2000000000000000001]' derivation='User' name='[usr:Calculation_2000000000000000001:qk]' pivot='key' type='quantitative' />
+      </datasource-dependencies>
+      
+      <shelf-sorts><shelf-sort-v2 dimension-to-sort='[federated.0campaignsummary00000000].[none:campaign_name:nk]' direction='DESC' measure-to-sort-by='[federated.0campaignsummary00000000].[usr:Calculation_2000000000000000001:qk]' shelf='rows' /></shelf-sorts>
+      
+      <aggregation value='true' />
+    </view>
+    <style><style-rule element='mark'><format attr='mark-labels-show' value='true' /><format attr='mark-labels-cull' value='true' /></style-rule></style>
+    <panes>
+      <pane selection-relaxation-option='selection-relaxation-allow'>
+        <view><breakdown value='auto' /></view>
+        <mark class='Bar' />
+        <encodings><text column='[federated.0campaignsummary00000000].[sum:campaign_avg_daily_views:qk]' /></encodings>
+      </pane>
+    </panes>
+    <rows>[federated.0campaignsummary00000000].[none:campaign_name:nk]</rows>
+    <cols>([federated.0campaignsummary00000000].[sum:baseline_avg_daily_views:qk] + [federated.0campaignsummary00000000].[sum:campaign_avg_daily_views:qk])</cols>
+  </table>
+  <simple-id uuid='{E428AC85-E0C6-4401-8D8B-81476A520111}' />
+</worksheet>
+<worksheet name="View Lift by Campaign">
+  <layout-options><title><formatted-text><run bold='true' fontsize='11'>View Lift % by Campaign (colour = channel)</run></formatted-text></title></layout-options>
+  <table>
+    <view>
+      <datasources><datasource caption='Campaign Summary' name='federated.0campaignsummary00000000' /></datasources>
+      <datasource-dependencies datasource='federated.0campaignsummary00000000'>
+        <column caption="Campaign Id" datatype='integer' name='[campaign_id]' role='dimension' type='ordinal' />
+<column caption="Campaign Name" datatype='string' name='[campaign_name]' role='dimension' type='nominal' />
+<column caption="Channel" datatype='string' name='[channel]' role='dimension' type='nominal' />
+<column caption="Target Category" datatype='string' name='[target_category]' role='dimension' type='nominal' />
+<column caption="Start Date" datatype='date' name='[start_date]' role='dimension' type='ordinal' />
+<column caption="End Date" datatype='date' name='[end_date]' role='dimension' type='ordinal' />
+<column caption="Duration Days" datatype='integer' name='[duration_days]' role='measure' type='quantitative' />
+<column caption="Budget (USD)" datatype='integer' name='[budget_usd]' role='measure' type='quantitative' />
+<column caption="Baseline Avg Daily Views" datatype='real' name='[baseline_avg_daily_views]' role='measure' type='quantitative' />
+<column caption="Campaign Avg Daily Views" datatype='real' name='[campaign_avg_daily_views]' role='measure' type='quantitative' />
+<column caption="View Lift Pct" datatype='real' name='[view_lift_pct]' role='measure' type='quantitative' />
+<column caption="Incremental Views" datatype='integer' name='[incremental_views]' role='measure' type='quantitative' />
+<column caption="Attributed Views" datatype='integer' name='[attributed_views]' role='measure' type='quantitative' />
+<column caption="Attributed Add To Carts" datatype='integer' name='[attributed_add_to_carts]' role='measure' type='quantitative' />
+<column caption="Attributed Purchases" datatype='integer' name='[attributed_purchases]' role='measure' type='quantitative' />
+<column caption="Attributed Revenue (USD)" datatype='real' name='[attributed_revenue_usd]' role='measure' type='quantitative' />
+<column caption="View To Cart Rate Pct" datatype='real' name='[view_to_cart_rate_pct]' role='measure' type='quantitative' />
+<column caption="Cost Per Incremental View (USD)" datatype='real' name='[cost_per_incremental_view_usd]' role='measure' type='quantitative' />
+<column caption="ROAS" datatype='real' name='[roas]' role='measure' type='quantitative' />
+<column caption="View Lift %" datatype='real' default-format="p0.0%" name='[Calculation_2000000000000000001]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([campaign_avg_daily_views]) / SUM([baseline_avg_daily_views]) - 1" /></column>
+<column caption="Avg Lift % (KPI)" datatype='real' default-format="p0.0%" name='[Calculation_2000000000000000002]' role='measure' type='quantitative'><calculation class='tableau' formula="AVG([view_lift_pct]) / 100" /></column>
+<column caption="Total Incremental Views (KPI)" datatype='integer' default-format="n#,##0" name='[Calculation_2000000000000000003]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([incremental_views])" /></column>
+<column caption="Cost per Incremental View (KPI)" datatype='real' default-format='c"$"#,##0.00' name='[Calculation_2000000000000000004]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([budget_usd]) / SUM([incremental_views])" /></column>
+<column caption="ROAS (KPI)" datatype='real' default-format='n#,##0.00"x"' name='[Calculation_2000000000000000005]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([attributed_revenue_usd]) / SUM([budget_usd])" /></column>
+        <column-instance column='[campaign_name]' derivation='None' name='[none:campaign_name:nk]' pivot='key' type='nominal' />
+<column-instance column='[Calculation_2000000000000000001]' derivation='User' name='[usr:Calculation_2000000000000000001:qk]' pivot='key' type='quantitative' />
+<column-instance column='[channel]' derivation='None' name='[none:channel:nk]' pivot='key' type='nominal' />
+      </datasource-dependencies>
+      
+      <shelf-sorts><shelf-sort-v2 dimension-to-sort='[federated.0campaignsummary00000000].[none:campaign_name:nk]' direction='DESC' measure-to-sort-by='[federated.0campaignsummary00000000].[usr:Calculation_2000000000000000001:qk]' shelf='rows' /></shelf-sorts>
+      
+      <aggregation value='true' />
+    </view>
+    <style><style-rule element='mark'><format attr='mark-labels-show' value='true' /><format attr='mark-labels-cull' value='true' /></style-rule></style>
+    <panes>
+      <pane selection-relaxation-option='selection-relaxation-allow'>
+        <view><breakdown value='auto' /></view>
+        <mark class='Bar' />
+        <encodings><color column='[federated.0campaignsummary00000000].[none:channel:nk]' /><text column='[federated.0campaignsummary00000000].[usr:Calculation_2000000000000000001:qk]' /></encodings>
+      </pane>
+    </panes>
+    <rows>[federated.0campaignsummary00000000].[none:campaign_name:nk]</rows>
+    <cols>[federated.0campaignsummary00000000].[usr:Calculation_2000000000000000001:qk]</cols>
+  </table>
+  <simple-id uuid='{D5EE6234-6B0C-4A0B-BB0F-5A4451E3D3AC}' />
+</worksheet>
+<worksheet name="Channel Performance">
+  <layout-options><title><formatted-text><run bold='true' fontsize='11'>Attributed Views by Channel (colour/label = ROAS)</run></formatted-text></title></layout-options>
+  <table>
+    <view>
+      <datasources><datasource caption='Campaign Summary' name='federated.0campaignsummary00000000' /></datasources>
+      <datasource-dependencies datasource='federated.0campaignsummary00000000'>
+        <column caption="Campaign Id" datatype='integer' name='[campaign_id]' role='dimension' type='ordinal' />
+<column caption="Campaign Name" datatype='string' name='[campaign_name]' role='dimension' type='nominal' />
+<column caption="Channel" datatype='string' name='[channel]' role='dimension' type='nominal' />
+<column caption="Target Category" datatype='string' name='[target_category]' role='dimension' type='nominal' />
+<column caption="Start Date" datatype='date' name='[start_date]' role='dimension' type='ordinal' />
+<column caption="End Date" datatype='date' name='[end_date]' role='dimension' type='ordinal' />
+<column caption="Duration Days" datatype='integer' name='[duration_days]' role='measure' type='quantitative' />
+<column caption="Budget (USD)" datatype='integer' name='[budget_usd]' role='measure' type='quantitative' />
+<column caption="Baseline Avg Daily Views" datatype='real' name='[baseline_avg_daily_views]' role='measure' type='quantitative' />
+<column caption="Campaign Avg Daily Views" datatype='real' name='[campaign_avg_daily_views]' role='measure' type='quantitative' />
+<column caption="View Lift Pct" datatype='real' name='[view_lift_pct]' role='measure' type='quantitative' />
+<column caption="Incremental Views" datatype='integer' name='[incremental_views]' role='measure' type='quantitative' />
+<column caption="Attributed Views" datatype='integer' name='[attributed_views]' role='measure' type='quantitative' />
+<column caption="Attributed Add To Carts" datatype='integer' name='[attributed_add_to_carts]' role='measure' type='quantitative' />
+<column caption="Attributed Purchases" datatype='integer' name='[attributed_purchases]' role='measure' type='quantitative' />
+<column caption="Attributed Revenue (USD)" datatype='real' name='[attributed_revenue_usd]' role='measure' type='quantitative' />
+<column caption="View To Cart Rate Pct" datatype='real' name='[view_to_cart_rate_pct]' role='measure' type='quantitative' />
+<column caption="Cost Per Incremental View (USD)" datatype='real' name='[cost_per_incremental_view_usd]' role='measure' type='quantitative' />
+<column caption="ROAS" datatype='real' name='[roas]' role='measure' type='quantitative' />
+<column caption="View Lift %" datatype='real' default-format="p0.0%" name='[Calculation_2000000000000000001]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([campaign_avg_daily_views]) / SUM([baseline_avg_daily_views]) - 1" /></column>
+<column caption="Avg Lift % (KPI)" datatype='real' default-format="p0.0%" name='[Calculation_2000000000000000002]' role='measure' type='quantitative'><calculation class='tableau' formula="AVG([view_lift_pct]) / 100" /></column>
+<column caption="Total Incremental Views (KPI)" datatype='integer' default-format="n#,##0" name='[Calculation_2000000000000000003]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([incremental_views])" /></column>
+<column caption="Cost per Incremental View (KPI)" datatype='real' default-format='c"$"#,##0.00' name='[Calculation_2000000000000000004]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([budget_usd]) / SUM([incremental_views])" /></column>
+<column caption="ROAS (KPI)" datatype='real' default-format='n#,##0.00"x"' name='[Calculation_2000000000000000005]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([attributed_revenue_usd]) / SUM([budget_usd])" /></column>
+        <column-instance column='[channel]' derivation='None' name='[none:channel:nk]' pivot='key' type='nominal' />
+<column-instance column='[attributed_views]' derivation='Sum' name='[sum:attributed_views:qk]' pivot='key' type='quantitative' />
+<column-instance column='[Calculation_2000000000000000005]' derivation='User' name='[usr:Calculation_2000000000000000005:qk]' pivot='key' type='quantitative' />
+      </datasource-dependencies>
+      
+      <shelf-sorts><shelf-sort-v2 dimension-to-sort='[federated.0campaignsummary00000000].[none:channel:nk]' direction='DESC' measure-to-sort-by='[federated.0campaignsummary00000000].[sum:attributed_views:qk]' shelf='rows' /></shelf-sorts>
+      
+      <aggregation value='true' />
+    </view>
+    <style><style-rule element='mark'><format attr='mark-labels-show' value='true' /><format attr='mark-labels-cull' value='true' /></style-rule></style>
+    <panes>
+      <pane selection-relaxation-option='selection-relaxation-allow'>
+        <view><breakdown value='auto' /></view>
+        <mark class='Bar' />
+        <encodings><color column='[federated.0campaignsummary00000000].[usr:Calculation_2000000000000000005:qk]' /><text column='[federated.0campaignsummary00000000].[usr:Calculation_2000000000000000005:qk]' /></encodings>
+      </pane>
+    </panes>
+    <rows>[federated.0campaignsummary00000000].[none:channel:nk]</rows>
+    <cols>[federated.0campaignsummary00000000].[sum:attributed_views:qk]</cols>
+  </table>
+  <simple-id uuid='{8C22785C-D362-4DC1-ACA9-3C591C6240E9}' />
+</worksheet>
+<worksheet name="Top Campaign Products">
+  <layout-options><title><formatted-text><run bold='true' fontsize='11'>Top 10 Products by Campaign-Driven Views</run></formatted-text></title></layout-options>
+  <table>
+    <view>
+      <datasources><datasource caption='Campaign Views' name='federated.0campaignviews0000000000' /></datasources>
+      <datasource-dependencies datasource='federated.0campaignviews0000000000'>
+        <column caption="View Id" datatype='integer' name='[view_id]' role='dimension' type='ordinal' />
+<column caption="View Timestamp" datatype='datetime' name='[view_ts]' role='dimension' type='ordinal' />
+<column caption="View Date" datatype='date' name='[view_date]' role='dimension' type='ordinal' />
+<column caption="User Id" datatype='integer' name='[user_id]' role='dimension' type='ordinal' />
+<column caption="Product Id" datatype='integer' name='[product_id]' role='dimension' type='ordinal' />
+<column caption="Category" datatype='string' name='[category]' role='dimension' type='nominal' />
+<column caption="Traffic Source" datatype='string' name='[traffic_source]' role='dimension' type='nominal' />
+<column caption="Attributed Campaign Id" datatype='integer' name='[campaign_id]' role='dimension' type='ordinal' />
+<column caption="Is Campaign View" datatype='integer' name='[is_campaign_view]' role='measure' type='quantitative' />
+<column caption="Added To Cart" datatype='integer' name='[added_to_cart]' role='measure' type='quantitative' />
+<column caption="Purchased" datatype='integer' name='[purchased]' role='measure' type='quantitative' />
+<column caption="Period Campaign Id" datatype='integer' name='[period_campaign_id]' role='dimension' type='ordinal' />
+<column caption="Campaign Period" datatype='string' name='[campaign_period]' role='dimension' type='nominal' />
+<column caption="Product Name" datatype='string' name='[product_name]' role='dimension' type='nominal' />
+<column caption="Brand" datatype='string' name='[brand]' role='dimension' type='nominal' />
+<column caption="Price" datatype='real' name='[price]' role='measure' type='quantitative' />
+<column caption="Campaign Name" datatype='string' name='[campaign_name]' role='dimension' type='nominal' />
+<column caption="Channel" datatype='string' name='[channel]' role='dimension' type='nominal' />
+<column caption="Duration Days" datatype='real' name='[duration_days]' role='measure' type='quantitative' />
+<column caption="Views" datatype='integer' default-format="n#,##0" name='[Calculation_1000000000000000001]' role='measure' type='quantitative'><calculation class='tableau' formula="COUNT([view_id])" /></column>
+<column caption="Campaign View Share" datatype='real' default-format="p0.0%" name='[Calculation_1000000000000000002]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([is_campaign_view]) / COUNT([view_id])" /></column>
+<column caption="Add to Cart Rate" datatype='real' default-format="p0.00%" name='[Calculation_1000000000000000003]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([added_to_cart]) / COUNT([view_id])" /></column>
+<column caption="Purchase Rate" datatype='real' default-format="p0.00%" name='[Calculation_1000000000000000004]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([purchased]) / COUNT([view_id])" /></column>
+<column caption="Traffic Type" datatype='string' name='[Calculation_1000000000000000005]' role='dimension' type='nominal'><calculation class='tableau' formula='IF [is_campaign_view] = 1 THEN "Campaign" ELSE "Organic" END' /></column>
+<column caption="Revenue" datatype='real' default-format='c"$"#,##0' name='[Calculation_1000000000000000006]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM(IF [purchased] = 1 THEN [price] END)" /></column>
+        <column-instance column='[product_name]' derivation='None' name='[none:product_name:nk]' pivot='key' type='nominal' />
+<column-instance column='[Calculation_1000000000000000001]' derivation='User' name='[usr:Calculation_1000000000000000001:qk]' pivot='key' type='quantitative' />
+<column-instance column='[campaign_name]' derivation='None' name='[none:campaign_name:nk]' pivot='key' type='nominal' />
+<column-instance column='[Calculation_1000000000000000005]' derivation='None' name='[none:Calculation_1000000000000000005:nk]' pivot='key' type='nominal' />
+      </datasource-dependencies>
+      <filter class='categorical' column='[federated.0campaignviews0000000000].[none:Calculation_1000000000000000005:nk]' context='true'><groupfilter function='member' level='[none:Calculation_1000000000000000005:nk]' member='&quot;Campaign&quot;' user:ui-domain='database' user:ui-enumeration='inclusive' user:ui-marker='enumerate' /></filter><filter class='categorical' column='[federated.0campaignviews0000000000].[none:product_name:nk]'><groupfilter count='10' end='top' function='end' units='records' user:ui-marker='end' user:ui-top-by-field='true'><groupfilter direction='DESC' expression='COUNT([view_id])' function='order' user:ui-marker='order'><groupfilter function='level-members' level='[none:product_name:nk]' /></groupfilter></groupfilter></filter>
+      <shelf-sorts><shelf-sort-v2 dimension-to-sort='[federated.0campaignviews0000000000].[none:product_name:nk]' direction='DESC' measure-to-sort-by='[federated.0campaignviews0000000000].[usr:Calculation_1000000000000000001:qk]' shelf='rows' /></shelf-sorts>
+      <slices><column>[federated.0campaignviews0000000000].[none:Calculation_1000000000000000005:nk]</column><column>[federated.0campaignviews0000000000].[none:product_name:nk]</column></slices>
+      <aggregation value='true' />
+    </view>
+    <style />
+    <panes>
+      <pane selection-relaxation-option='selection-relaxation-allow'>
+        <view><breakdown value='auto' /></view>
+        <mark class='Bar' />
+        <encodings><color column='[federated.0campaignviews0000000000].[none:campaign_name:nk]' /></encodings>
+      </pane>
+    </panes>
+    <rows>[federated.0campaignviews0000000000].[none:product_name:nk]</rows>
+    <cols>[federated.0campaignviews0000000000].[usr:Calculation_1000000000000000001:qk]</cols>
+  </table>
+  <simple-id uuid='{410704FF-E053-445A-9769-F8EEFE8361C8}' />
+</worksheet>
+<worksheet name="Conversion Campaign vs Organic">
+  <layout-options><title><formatted-text><run bold='true' fontsize='11'>Add-to-Cart &amp; Purchase Rate: Campaign vs Organic</run></formatted-text></title></layout-options>
+  <table>
+    <view>
+      <datasources><datasource caption='Campaign Views' name='federated.0campaignviews0000000000' /></datasources>
+      <datasource-dependencies datasource='federated.0campaignviews0000000000'>
+        <column caption="View Id" datatype='integer' name='[view_id]' role='dimension' type='ordinal' />
+<column caption="View Timestamp" datatype='datetime' name='[view_ts]' role='dimension' type='ordinal' />
+<column caption="View Date" datatype='date' name='[view_date]' role='dimension' type='ordinal' />
+<column caption="User Id" datatype='integer' name='[user_id]' role='dimension' type='ordinal' />
+<column caption="Product Id" datatype='integer' name='[product_id]' role='dimension' type='ordinal' />
+<column caption="Category" datatype='string' name='[category]' role='dimension' type='nominal' />
+<column caption="Traffic Source" datatype='string' name='[traffic_source]' role='dimension' type='nominal' />
+<column caption="Attributed Campaign Id" datatype='integer' name='[campaign_id]' role='dimension' type='ordinal' />
+<column caption="Is Campaign View" datatype='integer' name='[is_campaign_view]' role='measure' type='quantitative' />
+<column caption="Added To Cart" datatype='integer' name='[added_to_cart]' role='measure' type='quantitative' />
+<column caption="Purchased" datatype='integer' name='[purchased]' role='measure' type='quantitative' />
+<column caption="Period Campaign Id" datatype='integer' name='[period_campaign_id]' role='dimension' type='ordinal' />
+<column caption="Campaign Period" datatype='string' name='[campaign_period]' role='dimension' type='nominal' />
+<column caption="Product Name" datatype='string' name='[product_name]' role='dimension' type='nominal' />
+<column caption="Brand" datatype='string' name='[brand]' role='dimension' type='nominal' />
+<column caption="Price" datatype='real' name='[price]' role='measure' type='quantitative' />
+<column caption="Campaign Name" datatype='string' name='[campaign_name]' role='dimension' type='nominal' />
+<column caption="Channel" datatype='string' name='[channel]' role='dimension' type='nominal' />
+<column caption="Duration Days" datatype='real' name='[duration_days]' role='measure' type='quantitative' />
+<column caption="Views" datatype='integer' default-format="n#,##0" name='[Calculation_1000000000000000001]' role='measure' type='quantitative'><calculation class='tableau' formula="COUNT([view_id])" /></column>
+<column caption="Campaign View Share" datatype='real' default-format="p0.0%" name='[Calculation_1000000000000000002]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([is_campaign_view]) / COUNT([view_id])" /></column>
+<column caption="Add to Cart Rate" datatype='real' default-format="p0.00%" name='[Calculation_1000000000000000003]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([added_to_cart]) / COUNT([view_id])" /></column>
+<column caption="Purchase Rate" datatype='real' default-format="p0.00%" name='[Calculation_1000000000000000004]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM([purchased]) / COUNT([view_id])" /></column>
+<column caption="Traffic Type" datatype='string' name='[Calculation_1000000000000000005]' role='dimension' type='nominal'><calculation class='tableau' formula='IF [is_campaign_view] = 1 THEN "Campaign" ELSE "Organic" END' /></column>
+<column caption="Revenue" datatype='real' default-format='c"$"#,##0' name='[Calculation_1000000000000000006]' role='measure' type='quantitative'><calculation class='tableau' formula="SUM(IF [purchased] = 1 THEN [price] END)" /></column>
+        <column-instance column='[Calculation_1000000000000000005]' derivation='None' name='[none:Calculation_1000000000000000005:nk]' pivot='key' type='nominal' />
+<column-instance column='[Calculation_1000000000000000003]' derivation='User' name='[usr:Calculation_1000000000000000003:qk]' pivot='key' type='quantitative' />
+<column-instance column='[Calculation_1000000000000000004]' derivation='User' name='[usr:Calculation_1000000000000000004:qk]' pivot='key' type='quantitative' />
+      </datasource-dependencies>
+      
+      
+      
+      <aggregation value='true' />
+    </view>
+    <style><style-rule element='mark'><format attr='mark-labels-show' value='true' /><format attr='mark-labels-cull' value='true' /></style-rule></style>
+    <panes>
+      <pane selection-relaxation-option='selection-relaxation-allow'>
+        <view><breakdown value='auto' /></view>
+        <mark class='Bar' />
+        <encodings><color column='[federated.0campaignviews0000000000].[none:Calculation_1000000000000000005:nk]' /></encodings>
+      </pane>
+    </panes>
+    <rows>[federated.0campaignviews0000000000].[none:Calculation_1000000000000000005:nk]</rows>
+    <cols>([federated.0campaignviews0000000000].[usr:Calculation_1000000000000000003:qk] + [federated.0campaignviews0000000000].[usr:Calculation_1000000000000000004:qk])</cols>
+  </table>
+  <simple-id uuid='{8D565EA6-3FD2-4EFD-B041-6E5928A1D83B}' />
+</worksheet>
+  </worksheets>
+  
+<dashboards>
+  <dashboard enable-sort-zone-taborder='true' name='Campaign Impact'>
+    <style />
+    <size maxheight='1000' maxwidth='1300' minheight='1000' minwidth='1300' />
+    <datasources>
+      <datasource caption='Campaign Views' name='federated.0campaignviews0000000000' />
+      <datasource caption='Campaign Summary' name='federated.0campaignsummary00000000' />
+    </datasources>
+    <datasource-dependencies datasource='federated.0campaignviews0000000000'>
+      <column caption='Category' datatype='string' name='[category]' role='dimension' type='nominal' />
+      <column-instance column='[category]' derivation='None' name='[none:category:nk]' pivot='key' type='nominal' />
+    </datasource-dependencies>
+    <zones>
+      <zone h='100000' id='19' type-v2='layout-basic' w='100000' x='0' y='0'>
+        <zone h='98000' id='20' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
+          <zone h='6000' id='3' param='horz' type-v2='layout-flow' w='98400' x='800' y='1000'><zone h='6000' id='1' type-v2='text' w='78000' x='800' y='1000'><formatted-text><run bold='true' fontsize='18'>Marketing Campaign Impact on Product Views</run><run fontsize='10'>&#10;Jan–Jun 2025 · lift = avg daily views of the target category during the campaign vs the 14 days before</run></formatted-text></zone><zone h='6000' id='2' mode='checkdropdown' name='Daily Views Trend' param='[federated.0campaignviews0000000000].[none:category:nk]' type-v2='filter' values='database' w='20400' x='78800' y='1000' /></zone><zone h='11000' id='10' param='horz' type-v2='layout-flow' w='98400' x='800' y='7000'><zone h='11000' id='4' name="KPI Total Views" w='16400' x='800' y='7000' ><zone-style><format attr='border-style' value='none' /><format attr='margin' value='4' /></zone-style></zone><zone h='11000' id='5' name="KPI Campaign Share" w='16400' x='17200' y='7000' ><zone-style><format attr='border-style' value='none' /><format attr='margin' value='4' /></zone-style></zone><zone h='11000' id='6' name="KPI Avg Lift" w='16400' x='33600' y='7000' ><zone-style><format attr='border-style' value='none' /><format attr='margin' value='4' /></zone-style></zone><zone h='11000' id='7' name="KPI Incremental Views" w='16400' x='50000' y='7000' ><zone-style><format attr='border-style' value='none' /><format attr='margin' value='4' /></zone-style></zone><zone h='11000' id='8' name="KPI Cost per Incremental View" w='16400' x='66400' y='7000' ><zone-style><format attr='border-style' value='none' /><format attr='margin' value='4' /></zone-style></zone><zone h='11000' id='9' name="KPI ROAS" w='16400' x='82800' y='7000' ><zone-style><format attr='border-style' value='none' /><format attr='margin' value='4' /></zone-style></zone></zone><zone h='27000' id='11' name="Daily Views Trend" w='98400' x='800' y='18000' ><zone-style><format attr='border-style' value='none' /><format attr='margin' value='4' /></zone-style></zone><zone h='27000' id='14' param='horz' type-v2='layout-flow' w='98400' x='800' y='45000'><zone h='27000' id='12' name="Baseline vs Campaign" w='49200' x='800' y='45000' ><zone-style><format attr='border-style' value='none' /><format attr='margin' value='4' /></zone-style></zone><zone h='27000' id='13' name="View Lift by Campaign" w='49200' x='50000' y='45000' ><zone-style><format attr='border-style' value='none' /><format attr='margin' value='4' /></zone-style></zone></zone><zone h='27000' id='18' param='horz' type-v2='layout-flow' w='98400' x='800' y='72000'><zone h='27000' id='15' name="Channel Performance" w='32800' x='800' y='72000' ><zone-style><format attr='border-style' value='none' /><format attr='margin' value='4' /></zone-style></zone><zone h='27000' id='16' name="Top Campaign Products" w='32800' x='33600' y='72000' ><zone-style><format attr='border-style' value='none' /><format attr='margin' value='4' /></zone-style></zone><zone h='27000' id='17' name="Conversion Campaign vs Organic" w='32800' x='66400' y='72000' ><zone-style><format attr='border-style' value='none' /><format attr='margin' value='4' /></zone-style></zone></zone>
+        </zone>
+      </zone>
+    </zones>
+    <simple-id uuid='{BA4D7754-D996-4F7A-B44B-1386E6D77E0D}' />
+  </dashboard>
+</dashboards>
+  <windows source-height='51'><window class='worksheet' hidden='true' name="KPI Total Views"><cards><edge name='left'><strip size='160'><card type='pages' /><card type='filters' /><card type='marks' /></strip></edge><edge name='top'><strip size='2147483647'><card type='columns' /></strip><strip size='2147483647'><card type='rows' /></strip><strip size='31'><card type='title' /></strip></edge></cards><simple-id uuid='{64136CF2-E68B-4C4A-9B03-625232E4458E}' /></window><window class='worksheet' hidden='true' name="KPI Campaign Share"><cards><edge name='left'><strip size='160'><card type='pages' /><card type='filters' /><card type='marks' /></strip></edge><edge name='top'><strip size='2147483647'><card type='columns' /></strip><strip size='2147483647'><card type='rows' /></strip><strip size='31'><card type='title' /></strip></edge></cards><simple-id uuid='{7BCAAF29-C10B-4DA7-8B40-082111C40189}' /></window><window class='worksheet' hidden='true' name="KPI Avg Lift"><cards><edge name='left'><strip size='160'><card type='pages' /><card type='filters' /><card type='marks' /></strip></edge><edge name='top'><strip size='2147483647'><card type='columns' /></strip><strip size='2147483647'><card type='rows' /></strip><strip size='31'><card type='title' /></strip></edge></cards><simple-id uuid='{58BB0693-C993-4F54-836E-D1217351868E}' /></window><window class='worksheet' hidden='true' name="KPI Incremental Views"><cards><edge name='left'><strip size='160'><card type='pages' /><card type='filters' /><card type='marks' /></strip></edge><edge name='top'><strip size='2147483647'><card type='columns' /></strip><strip size='2147483647'><card type='rows' /></strip><strip size='31'><card type='title' /></strip></edge></cards><simple-id uuid='{0688A641-0CFC-4073-92A3-A27F99C5E181}' /></window><window class='worksheet' hidden='true' name="KPI Cost per Incremental View"><cards><edge name='left'><strip size='160'><card type='pages' /><card type='filters' /><card type='marks' /></strip></edge><edge name='top'><strip size='2147483647'><card type='columns' /></strip><strip size='2147483647'><card type='rows' /></strip><strip size='31'><card type='title' /></strip></edge></cards><simple-id uuid='{DF2C66A9-F620-4FA9-B37A-2BB1E64E7122}' /></window><window class='worksheet' hidden='true' name="KPI ROAS"><cards><edge name='left'><strip size='160'><card type='pages' /><card type='filters' /><card type='marks' /></strip></edge><edge name='top'><strip size='2147483647'><card type='columns' /></strip><strip size='2147483647'><card type='rows' /></strip><strip size='31'><card type='title' /></strip></edge></cards><simple-id uuid='{60751714-810A-4F2B-9CBF-1C634B98294E}' /></window><window class='worksheet' hidden='true' name="Daily Views Trend"><cards><edge name='left'><strip size='160'><card type='pages' /><card type='filters' /><card type='marks' /></strip></edge><edge name='top'><strip size='2147483647'><card type='columns' /></strip><strip size='2147483647'><card type='rows' /></strip><strip size='31'><card type='title' /></strip></edge></cards><simple-id uuid='{F93D7F3E-5177-4846-8CB5-58489E125244}' /></window><window class='worksheet' hidden='true' name="Baseline vs Campaign"><cards><edge name='left'><strip size='160'><card type='pages' /><card type='filters' /><card type='marks' /></strip></edge><edge name='top'><strip size='2147483647'><card type='columns' /></strip><strip size='2147483647'><card type='rows' /></strip><strip size='31'><card type='title' /></strip></edge></cards><simple-id uuid='{D6173B97-B5D4-4BF8-BD47-7330F18C0CEC}' /></window><window class='worksheet' hidden='true' name="View Lift by Campaign"><cards><edge name='left'><strip size='160'><card type='pages' /><card type='filters' /><card type='marks' /></strip></edge><edge name='top'><strip size='2147483647'><card type='columns' /></strip><strip size='2147483647'><card type='rows' /></strip><strip size='31'><card type='title' /></strip></edge></cards><simple-id uuid='{F6948CE7-64E1-40FE-B690-33060610DBCD}' /></window><window class='worksheet' hidden='true' name="Channel Performance"><cards><edge name='left'><strip size='160'><card type='pages' /><card type='filters' /><card type='marks' /></strip></edge><edge name='top'><strip size='2147483647'><card type='columns' /></strip><strip size='2147483647'><card type='rows' /></strip><strip size='31'><card type='title' /></strip></edge></cards><simple-id uuid='{2D707DE5-1C52-4586-88E4-012993666AB9}' /></window><window class='worksheet' hidden='true' name="Top Campaign Products"><cards><edge name='left'><strip size='160'><card type='pages' /><card type='filters' /><card type='marks' /></strip></edge><edge name='top'><strip size='2147483647'><card type='columns' /></strip><strip size='2147483647'><card type='rows' /></strip><strip size='31'><card type='title' /></strip></edge></cards><simple-id uuid='{6C68CED3-AA0D-4294-AC0D-E9C3180F8D5C}' /></window><window class='worksheet' hidden='true' name="Conversion Campaign vs Organic"><cards><edge name='left'><strip size='160'><card type='pages' /><card type='filters' /><card type='marks' /></strip></edge><edge name='top'><strip size='2147483647'><card type='columns' /></strip><strip size='2147483647'><card type='rows' /></strip><strip size='31'><card type='title' /></strip></edge></cards><simple-id uuid='{F3D2D540-B883-42B6-A4A0-E1AA8F9C0D59}' /></window><window class='dashboard' maximized='true' name='Campaign Impact'><viewpoints><viewpoint name="KPI Total Views"><zoom type='entire-view' /></viewpoint><viewpoint name="KPI Campaign Share"><zoom type='entire-view' /></viewpoint><viewpoint name="KPI Avg Lift"><zoom type='entire-view' /></viewpoint><viewpoint name="KPI Incremental Views"><zoom type='entire-view' /></viewpoint><viewpoint name="KPI Cost per Incremental View"><zoom type='entire-view' /></viewpoint><viewpoint name="KPI ROAS"><zoom type='entire-view' /></viewpoint><viewpoint name="Daily Views Trend"><zoom type='entire-view' /></viewpoint><viewpoint name="Baseline vs Campaign"><zoom type='entire-view' /></viewpoint><viewpoint name="View Lift by Campaign"><zoom type='entire-view' /></viewpoint><viewpoint name="Channel Performance"><zoom type='entire-view' /></viewpoint><viewpoint name="Top Campaign Products"><zoom type='entire-view' /></viewpoint><viewpoint name="Conversion Campaign vs Organic"><zoom type='entire-view' /></viewpoint></viewpoints><active id='-1' /><simple-id uuid='{067DB2B8-5A9D-4D52-8547-73AF6E481C3F}' /></window></windows>
+</workbook>

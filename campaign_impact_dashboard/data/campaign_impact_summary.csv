@@ -1,0 +1,8 @@
+campaign_id,campaign_name,channel,target_category,start_date,end_date,duration_days,budget_usd,baseline_avg_daily_views,campaign_avg_daily_views,view_lift_pct,incremental_views,attributed_views,attributed_add_to_carts,attributed_purchases,attributed_revenue_usd,view_to_cart_rate_pct,cost_per_incremental_view_usd,roas
+1,New Year Laptop Sale,Email,Laptops,2025-01-20,2025-02-02,14,6000,100.2,183.8,83.4,1170,1203,139,47,88731.01,11.55,5.128,14.79
+2,Valentine's Wearables,Social,Wearables,2025-02-05,2025-02-14,10,4500,56.5,115.1,103.7,586,629,77,26,8154.56,12.24,7.679,1.81
+3,Spring Audio Launch,Influencer,Audio,2025-03-10,2025-03-23,14,8000,67.4,184.7,174.2,1643,1516,164,59,16683.11,10.82,4.869,2.09
+4,Smartphone Trade-In Push,Search,Smartphones,2025-04-07,2025-04-27,21,12000,107.9,187.2,73.6,1667,1555,164,64,53510.17,10.55,7.199,4.46
+5,Gamer Week,Display,Gaming,2025-05-12,2025-05-18,7,3500,68.2,79.4,16.4,79,110,13,4,511.8,11.82,44.586,0.15
+6,Summer Accessories Bundle,Email,Accessories,2025-06-02,2025-06-15,14,2500,59.5,86.1,44.8,373,400,44,19,1263.32,11.0,6.702,0.51
+7,Mid-Year Laptop Clearance,Social,Laptops,2025-06-16,2025-06-29,14,7000,99.1,213.5,115.5,1602,1542,182,65,118431.13,11.8,4.37,16.92
